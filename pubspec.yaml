@@ -1,0 +1,222 @@
+name: claimz
+description: A new Flutter project.
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as lib/views/widgets/paysilpWidgetCFBundleVersion.
+# Read more about iOS versioning at
+# https://developexr.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.12+15
+
+environment:
+  sdk: ">=2.17.5 <3.0.0"
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_svg: ^1.1.4
+  glassmorphism: ^3.0.0
+  curved_navigation_bar: ^1.0.3
+  syncfusion_flutter_charts: ^20.2.44
+  intl: ^0.17.0
+  geolocator: ^8.2.0
+  geocoding: ^2.0.4
+  http: ^0.13.5
+  provider: ^6.0.3
+  flash: ^2.0.3+3
+  shared_preferences: ^2.0.15
+  lottie: ^1.4.1
+  another_flushbar: ^1.10.29
+  # latlong2:
+  timeline_tile: 2.0.0
+  url_launcher: ^6.1.6
+  dio: ^4.0.6
+  # path_provider: ^2.0.11
+  path_provider: ^2.0.14
+  open_file: ^3.2.1
+  simple_ripple_animation:
+  fl_chart: ^0.55.1
+  accordion: ^2.5.1
+  
+  #  google_maps_flutter: ^2.0.6 #map
+  roundcheckbox: ^2.0.5
+  percent_indicator: ^4.2.2
+  file_picker: ^4.6.1
+  flutter_background_service: ^2.4.6
+  flutter_google_places: ^0.3.0
+  # google_maps_webservice: ^0.0.20-nullsafety.5
+  google_api_headers:
+  # device_info_plus:
+  expandable: ^5.0.1
+  image_picker: ^0.8.5+3
+  shimmer: ^2.0.0
+  number_to_words_english: ^2.0.2
+  cached_network_image: ^3.2.1
+  scrollable_positioned_list: ^0.3.5
+  image_cropper: ^3.0.0
+  dropdown_textfield: ^1.0.5
+  flutter_easyloading: ^3.0.5
+  flutter_expanded_tile: ^0.3.6
+  # firebase_core: ^1.17.1
+  # firebase_core: ^2.14.0
+  # firebase_core:
+  # firebase_messaging: ^11.4.1
+  # firebase_messaging: ^14.6.3
+  # firebase_messaging:
+  flutter_local_notifications: ^9.6.1
+  flutter_downloader: ^1.8.4
+  #  downloads_path_provider_28:
+  permission_handler:
+  path:
+  # path: ^1.8.2
+  location: ^4.4.0
+  chip_list: ^2.3.3+8
+  flutter_animated_button: ^2.0.2
+  transitioner:
+  # google_maps_flutter: ^2.2.1
+  # edge_detection: ^1.0.9
+  # month_year_picker: ^0.2.0+3
+  flutter_switch: ^0.3.2
+  sizer: ^2.0.15
+  # firebase_dynamic_links: 2.0.8
+  # firebase_dynamic_links: ^5.3.3
+  # firebase_dynamic_links:
+  photo_view:
+  blurry: ^1.4.2
+  custom_info_window: ^1.0.1
+  #flutter_simple_treeview: ^3.0.2
+  flutter_treeview:
+  flutter_map:
+  latlong2: ^0.8.1
+  bottom_sheet: ^3.1.2
+  timezone:
+  charts_flutter:
+  flutter_fancy_tree_view: ^0.5.3+2
+  camera: ^0.10.5
+  face_camera: ^0.0.6
+  firebase_core: ^2.14.0
+  firebase_messaging: ^14.6.3
+  firebase_dynamic_links: ^5.3.3
+  unique_identifier:
+  store_redirect: ^2.0.1
+  device_info_plus:
+  
+  # android_alarm_manager_plus:
+  # background_location:
+  #   git:
+  #     url: https://github.com/mejbahulkabir/backgroundLocationKBR.git
+  #     ref: master
+  
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  # firebase_analytics: ^9.3.8
+  # firebase_analytics: ^10.4.3
+flutter_icons:
+  image_path: "assets/img/logo.png"
+  android: true
+  ios: true
+
+dependency_overrides:
+  # firebase_core: 
+  # firebase_messaging: 
+  # firebase_dynamic_links: 
+  # flutter_launcher_icons:
+  flutter_launcher_icons:
+  edge_detection: ^1.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^2.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/img/
+    - assets/icons/
+    - assets/icons/nav bar/
+    - assets/fonts/
+    - assets/profilepage_img/
+    - assets/json/
+    - assets/clamizFrom/
+    - assets/holidaylist/
+    - assets/travelIcon/
+    - assets/birthday/
+    - assets/organization/
+    - assets/org/
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+
+  fonts:
+    - family: SourceSansPro
+      fonts:
+        - asset: assets/fonts/SourceSansPro-Black.ttf
+          weight: 900
+        - asset: assets/fonts/SourceSansPro-BlackItalic.ttf
+          weight: 900
+        - asset: assets/fonts/SourceSansPro-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/SourceSansPro-BoldItalic.ttf
+          weight: 700
+        - asset: assets/fonts/SourceSansPro-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/SourceSansPro-ExtraLightItalic.ttf
+          weight: 200
+        - asset: assets/fonts/SourceSansPro-Italic.ttf
+          weight: 300  
+        - asset: assets/fonts/SourceSansPro-Light.ttf
+          weight: 300
+        - asset: assets/fonts/SourceSansPro-LightItalic.ttf
+          weight: 300
+        - asset: assets/fonts/SourceSansPro-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/SourceSansPro-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/SourceSansPro-SemiBoldItalic.ttf
+          weight: 600
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages

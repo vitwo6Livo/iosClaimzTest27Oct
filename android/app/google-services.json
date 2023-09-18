@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "564418580832",
+    "project_id": "claimz-783eb",
+    "storage_bucket": "claimz-783eb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:564418580832:android:35ff32d82f0c183422ce05",
+        "android_client_info": {
+          "package_name": "com.claimz.claimz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "564418580832-mlqfit4jee40d9fsbcgrtevng2b3h7g7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB80PfziJcI-5dJ9SewywDru4Yi0mk3hXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "564418580832-mlqfit4jee40d9fsbcgrtevng2b3h7g7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "564418580832-0a3ensmpmiieuqmdetvgipahc81emhq2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.claimz.claimz"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

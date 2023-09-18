@@ -1,0 +1,8683 @@
+import 'dart:io';
+import 'package:accordion/accordion.dart';
+import 'package:accordion/controllers.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:chip_list/chip_list.dart';
+import 'package:claimz/provider/theme_provider.dart';
+import 'package:claimz/views/config/mediaQuery.dart';
+import 'package:edge_detection/edge_detection.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animated_button/flutter_animated_button.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_api_headers/google_api_headers.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/directions.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_ripple_animation/simple_ripple_animation.dart';
+import 'package:timeline_tile/timeline_tile.dart';
+import '../../../res/components/containerStyle.dart';
+import '../../../viewModel/claimzFormIndividualViewModel.dart';
+import '../../widgets/managerScreenWidgets/claimManager/claimManagerScreen.dart';
+
+class ConvenyanceClaimFrom extends StatefulWidget {
+  final Map<String, dynamic> data;
+  final Map<String, dynamic> dateData;
+  final Map<String, dynamic> refreshData;
+  final bool fromScreen;
+
+  @override
+  State<ConvenyanceClaimFrom> createState() => ConvenyanceClaimFromState();
+
+  ConvenyanceClaimFrom(
+      this.data, this.dateData, this.refreshData, this.fromScreen);
+}
+
+class ConvenyanceClaimFromState extends State<ConvenyanceClaimFrom>
+    with SingleTickerProviderStateMixin {
+  final ImagePicker _picker = ImagePicker();
+
+  XFile? _ie_file;
+  late TransformationController controller;
+  late AnimationController animationController;
+  Animation<Matrix4>? animation;
+  OverlayEntry? entry;
+  GlobalKey<FormState> _key = GlobalKey<FormState>();
+  TextEditingController _reason = TextEditingController();
+  TextEditingController _remarks = TextEditingController();
+  TextEditingController travelPurpose = TextEditingController();
+
+  String? add;
+
+  TextEditingController meet_to = TextEditingController();
+  TextEditingController feedback = TextEditingController();
+  TextEditingController purpose = TextEditingController();
+
+  TextEditingController serviceprovider = TextEditingController();
+  TextEditingController from = TextEditingController();
+  TextEditingController to = TextEditingController();
+  TextEditingController departure = TextEditingController();
+  TextEditingController return_travel = TextEditingController();
+  TextEditingController tfrom_date = TextEditingController();
+  TextEditingController tto_date = TextEditingController();
+  TextEditingController tclaim_date = TextEditingController();
+  TextEditingController tfrom_time = TextEditingController();
+  TextEditingController tto_time = TextEditingController();
+  TextEditingController tgst_no = TextEditingController();
+  TextEditingController tgst_amount = TextEditingController();
+  TextEditingController tbasic_amount = TextEditingController();
+  TextEditingController tclaim_amount = TextEditingController();
+  TextEditingController texchangerate = TextEditingController();
+  TextEditingController distanceTravelled = TextEditingController();
+  TextEditingController tBillNo = TextEditingController();
+  TextEditingController controllerTravel = TextEditingController();
+  var travelLimit;
+  var foodLimit;
+  var incidentalLimit;
+
+  // XFile? tfile;
+  dynamic tfile;
+  XFile? torgfile;
+  String? tfile_link;
+  TextEditingController _place = TextEditingController();
+
+  TextEditingController fserviceprovider = TextEditingController();
+  TextEditingController ffrom = TextEditingController();
+  TextEditingController fto = TextEditingController();
+  TextEditingController ffrom_date = TextEditingController();
+  TextEditingController fto_date = TextEditingController();
+  TextEditingController fclaim_date = TextEditingController();
+  TextEditingController ffrom_time = TextEditingController();
+  TextEditingController fto_time = TextEditingController();
+  TextEditingController fgst_no = TextEditingController();
+  TextEditingController fgst_amount = TextEditingController();
+  TextEditingController fbasic_amount = TextEditingController();
+  TextEditingController fclaim_amount = TextEditingController();
+  TextEditingController fexchangerate = TextEditingController();
+  TextEditingController fBillNo = TextEditingController();
+  double? fCheckValue;
+  bool fCheck = false;
+
+  dynamic ffile;
+  XFile? forgfile;
+  String? ffile_link;
+
+  TextEditingController iserviceprovider = TextEditingController();
+  TextEditingController ipurchase = TextEditingController();
+  TextEditingController ifrom = TextEditingController();
+  TextEditingController ito = TextEditingController();
+  TextEditingController ifrom_date = TextEditingController();
+  TextEditingController ito_date = TextEditingController();
+  TextEditingController iclaim_date = TextEditingController();
+  TextEditingController ifrom_time = TextEditingController();
+  TextEditingController ito_time = TextEditingController();
+  TextEditingController igst_no = TextEditingController();
+  TextEditingController igst_amount = TextEditingController();
+  TextEditingController ibasic_amount = TextEditingController();
+  TextEditingController iclaim_amount = TextEditingController();
+  TextEditingController iexchangerate = TextEditingController();
+  TextEditingController iBillNo = TextEditingController();
+  double? iCheckValue;
+  bool iCheck = false;
+
+  dynamic ifile;
+  XFile? iorgfile;
+  String? ifile_link;
+
+  // i.XFile? _ie_file;
+  int _selection = 1;
+  String selected_mode = '', selected_accomondation = '';
+  int travelModeId = 1;
+  // TravelViewModel _iternaryDetails =  TravelViewModel();
+  // TravelViewModel _travel_details =  TravelViewModel();
+
+  double _final_amount = 0.0;
+  double _travel_amount = 0.0;
+  double _accomodation_amount = 0.0;
+  double _food_amount = 0.0;
+  double _local_amount = 0.0;
+  double _incidental_amount = 0.0;
+  String doc_no = "null";
+  DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+  DateTime? _dateTime;
+  TimeOfDay timeFrom = TimeOfDay.now();
+  String time_day = '';
+  int page_load = 0;
+
+  TimeOfDay _timeFrom = TimeOfDay.now();
+  String _time_day = '';
+  var kGoogleApiKey = "AIzaSyDJJ7rw4YTPHxvD1KuReHoQ-ja2VT3Sp18";
+  late LatLng myLocation;
+  String _to_lat = "";
+  String _to_long = "";
+  String _duration = "";
+  String _distance = "";
+  bool isClicked = false;
+  bool isLoading = true;
+
+  Future<File?> cropImage(File imageFile) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+        sourcePath: imageFile.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressQuality: 80,
+        compressFormat: ImageCompressFormat.jpg);
+    if (croppedImage == null) return null;
+    return File(croppedImage.path);
+  }
+
+  void pageTransition(
+      int selectedValue,
+      List<String> modeOfTravel,
+      Map<String, dynamic> providerLimit,
+      String docNo,
+      List<dynamic> travelDetails,
+      Map<String, dynamic> food,
+      List<dynamic> foodDetails,
+      Map<String, dynamic> incidental,
+      List<dynamic> incidentalDetails) {
+    print('CHANGED VALUEEEEEEEEEEEE: $selectedValue');
+    selectedValue == 0
+        ? _traveltab(modeOfTravel, providerLimit, docNo, travelDetails)
+        : selectedValue == 3
+            ? _foodtab(food, docNo, foodDetails)
+            : _incidentaltab(incidental, docNo, incidentalDetails);
+    // _selection == 1
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    print('SELECTED VALUEEEEEEEEEEE: $_selection');
+
+    print('SENT DATA: ${widget.data}');
+
+    meet_to.text = widget.data['met_to_whom'];
+    feedback.text = widget.data['remarks'];
+    purpose.text = widget.data['purpose'];
+    travelPurpose.text = widget.data['travel_purpose'];
+
+    // feedback.text = widget.data['remarks'];
+    tclaim_date.text = widget.data['date'];
+    from.text = widget.data['from'];
+    to.text = widget.data['to'];
+
+    fclaim_date.text = widget.data['date'];
+    iclaim_date.text = widget.data['date'];
+
+    Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+        .getClaimzLimit(widget.data['doc_no'], context)
+        .then((value) {
+      Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+          .getConveyanceDetails(context, widget.data['doc_no'])
+          .then((_) {
+        setState(() {
+          isLoading = false;
+          final providerLimit =
+              Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+                  .limit;
+
+          final details =
+              Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+                  .claimzForm;
+
+          travelLimit = providerLimit['travel'][0]['limit_per_km'];
+          foodLimit = providerLimit['food'][0]['limit'];
+          incidentalLimit = providerLimit['incidental'][0]['limit'];
+
+          print('INIIIIIIIIIIT: $travelLimit');
+          print('FOOOOOOOOOD: $travelLimit');
+          print('INCIDENNNNNTALLLLLLLLL: $travelLimit');
+
+          if (!details['data'].containsKey('travel') ||
+              !details['data'].containsKey('food') ||
+              !details['data'].containsKey('incidental')) {
+            serviceprovider.text = '';
+            departure.text = '';
+            return_travel.text = '';
+            tfrom_date.text = '';
+            tto_date.text = '';
+
+            tfrom_time.text = '';
+            tto_time.text = '';
+            tgst_no.text = '';
+            tgst_amount.text = '';
+            tbasic_amount.text = '';
+            tclaim_amount.text = '';
+            texchangerate.text = '';
+            distanceTravelled.text = '';
+            tBillNo.text = '';
+            tfile_link = '';
+
+            fserviceprovider.text = '';
+            ffrom.text = '';
+            fto.text = '';
+            ffrom_date.text = '';
+            fto_date.text = '';
+
+            ffrom_time.text = '';
+            fto_time.text = '';
+            fgst_no.text = '';
+            fgst_amount.text = '';
+            fbasic_amount.text = '';
+            fclaim_amount.text = '';
+            fexchangerate.text = '';
+            fBillNo.text = '';
+            ffile_link = '';
+
+            iserviceprovider.text = '';
+            ifrom.text = '';
+            ito.text = '';
+            ifrom_date.text = '';
+            ito_date.text = '';
+
+            ifrom_time.text = '';
+            ito_time.text = '';
+            igst_no.text = '';
+            igst_amount.text = '';
+            ibasic_amount.text = '';
+            iclaim_amount.text = '';
+            iexchangerate.text = '';
+            iBillNo.text = '';
+            ifile_link = '';
+          }
+          if (details['data'].containsKey('travel')) {
+            serviceprovider.text =
+                details['data']['travel']['service_provider'];
+            tgst_no.text = details['data']['travel']['GST_no'].toString();
+            tgst_amount.text =
+                details['data']['travel']['GST_amount'].toString();
+            tbasic_amount.text =
+                details['data']['travel']['basic_amount'] == null ||
+                        details['data']['travel']['basic_amount'] == '' ||
+                        details['data']['travel']['basic_amount'] == 0
+                    ? details['data']['travel']['total_amount'].toString()
+                    : details['data']['travel']['basic_amount'].toString();
+            tclaim_amount.text =
+                details['data']['travel']['total_amount'].toString();
+            distanceTravelled.text =
+                details['data']['travel']['distance'].toString();
+            tBillNo.text = details['data']['travel']['bill_no'].toString();
+            controllerTravel.text =
+                details['data']['travel']['total_amount'].toString();
+            tfile_link = details['data']['travel']['attachment'] == null ||
+                    details['data']['travel']['attachment'] ==
+                        'https://claimz.vitwo.in/public/pdf/'
+                ? ''
+                : details['data']['travel']['attachment'];
+
+            setState(() {
+              _finalSum("travel", details.toString(), tclaim_amount.text);
+            });
+          }
+          if (details['data'].containsKey('food')) {
+            fserviceprovider.text = details['data']['food']['service_provider'];
+            fgst_no.text = details['data']['food']['GST_no'].toString();
+            fgst_amount.text = details['data']['food']['GST_amount'].toString();
+            fbasic_amount.text =
+                details['data']['food']['basic_amount'].toString();
+            fclaim_amount.text =
+                details['data']['food']['total_amount'].toString();
+            fBillNo.text = details['data']['food']['bill_no'].toString();
+            ffile_link = details['data']['food']['attachment'] == null
+                ? ''
+                : details['data']['food']['attachment'];
+
+            setState(() {
+              _finalSum("food", details.toString(), fclaim_amount.text);
+            });
+          }
+          if (details['data'].containsKey('incidental')) {
+            iserviceprovider.text =
+                details['data']['incidental']['service_provider'];
+            igst_no.text = details['data']['incidental']['GST_no'].toString();
+            igst_amount.text =
+                details['data']['incidental']['GST_amount'].toString();
+            ibasic_amount.text =
+                details['data']['incidental']['basic_amount'].toString();
+            iclaim_amount.text =
+                details['data']['incidental']['total_amount'].toString();
+            iBillNo.text = details['data']['incidental']['bill_no'].toString();
+            ifile_link = details['data']['incidental']['attachment'] == null
+                ? ''
+                : details['data']['incidental']['attachment'];
+
+            setState(() {
+              _finalSum("incidental", details.toString(), iclaim_amount.text);
+            });
+          }
+        });
+      });
+    });
+
+    // final providerLimit =
+    //     Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+    //         .limit;
+
+    // travelLimit = providerLimit['travel'][0]['limit_per_km'];
+
+    super.initState();
+
+    controller = TransformationController();
+    animationController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200))
+      ..addListener(() => controller.value = animation!.value);
+
+    // Map data_iternary = {
+    //   "doc_no": widget.args["doc"].toString(),
+    //   "all": widget.args["all"].toString(),
+    // };
+    // print(data_iternary);
+    // _iternaryDetails.postTravelIternary(data_iternary);
+
+    // if (widget.args["doc"].toString() != null) {
+    //   _travel_details.postTravelDoc(data_iternary);
+    // }
+
+//adding listners
+
+    // tclaim_amount.addListener(() {
+    //   _travel_amount =  double.parse(tclaim_amount.text);
+    //   setState(() {
+    //     if(tclaim_amount.text==""){
+    //       _final_amount = 0.0;
+    //     }
+    //
+    //     _final_amount = _travel_amount;
+    //
+    //
+    //   });
+    // });
+
+    // tclaim_amount.addListener(() {
+    //   _travel_amount = double.parse(tclaim_amount.text);
+    //   setState(() {
+    //     if (tclaim_amount.text == "") {
+    //       _final_amount = 0.0;
+    //     }
+    //
+    //     _final_amount = _travel_amount;
+    //   });
+    // });
+
+    // doc_no = widget.args["doc"].toString();
+
+    // if (doc_no != "null") {
+    //   _travel_details.postTravelDoc(widget.args);
+    // }
+  }
+
+  int _mode_of_travel = 0;
+  final List<String> clipstyle = [
+    'Business',
+    'Economic',
+    'AC III',
+    'AC II',
+    'AC I',
+    'SL',
+    'Chair'
+  ];
+  int _mode_of_acco = 0;
+  final List<String> cliphotel = [
+    'Hotel',
+  ];
+
+  var mydata = "One way";
+  List<String> datatrip = [
+    "One way",
+    "Roundtrip",
+  ];
+  int? role;
+
+  var details = "Paid by company";
+  var adetails = "Paid by company";
+  var fdetails = "Paid by company";
+  var idetails = "Paid by company";
+  var ldetails = "Paid by company";
+
+  List<String> detail = [
+    "Paid by company",
+    "Paid by self",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context).darkTheme;
+    final provider =
+        Provider.of<ClaimzFormIndividualViewModel>(context).modeOfTravel;
+
+    final providerLimit =
+        Provider.of<ClaimzFormIndividualViewModel>(context).limit;
+
+    final conveyanceDetails =
+        Provider.of<ClaimzFormIndividualViewModel>(context).claimzForm;
+
+    final travelDetails =
+        Provider.of<ClaimzFormIndividualViewModel>(context).travelDetails;
+    final foodDetails =
+        Provider.of<ClaimzFormIndividualViewModel>(context).foodDetails;
+    final incidentalDetails =
+        Provider.of<ClaimzFormIndividualViewModel>(context).incidentalDetails;
+
+    print('CONVEYANCE TRAVELLLLLLLLL: $conveyanceDetails');
+
+    return isLoading
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : Stack(
+            children: [
+              Scaffold(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                body: Column(
+                  children: <Widget>[
+                    Padding(
+                      //box
+                      padding: EdgeInsets.only(
+                        top: SizeVariables.getHeight(context) * 0.05,
+                        left: SizeVariables.getWidth(context) * 0.04,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  // Navigator.of(context).pop();
+                                  widget.fromScreen == false
+                                      ? Navigator.of(context).push(
+                                          MaterialPageRoute(builder: (context) {
+                                          print(
+                                              'REFREEEEEEESH: ${widget.refreshData}');
+                                          return ClaimManagerScreen(
+                                              // widget.refreshData
+                                              );
+                                        }))
+                                      : Navigator.of(context).pop();
+                                },
+                                child: SvgPicture.asset(
+                                  "assets/icons/back button.svg",
+                                ),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              FittedBox(
+                                fit: BoxFit.contain,
+                                child: Text(
+                                  'Convenyance Claim Form',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .caption!
+                                      .copyWith(
+                                          fontSize: 16, color: Colors.grey),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(
+                                  left: SizeVariables.getWidth(context) * 0.08,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Icon(
+                                        Icons.file_open_rounded,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        width: SizeVariables.getWidth(context) *
+                                            0.02),
+                                    FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(
+                                        widget.data['doc_no'].toString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1!
+                                            .copyWith(
+                                                color: Colors.amber,
+                                                fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: SizeVariables.getWidth(context) * 0.02,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.75,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  // color: Colors.red,
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  // crossAxisAlignment: CrossAxisAlignment.end,
+                                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(
+                                        left: SizeVariables.getWidth(context) *
+                                            0.03,
+                                      ),
+                                      child: const Text(
+                                        '₹',
+                                        style: TextStyle(
+                                          fontSize: 35,
+                                          fontWeight: FontWeight.normal,
+                                          color: Color(0xffF59F23),
+                                        ),
+                                      ),
+                                    ),
+                                    // SizedBox(
+                                    //   width: SizeVariables.getWidth(context) * 0.02,
+                                    // ),
+                                    Container(
+                                      // padding: EdgeInsets.only(
+                                      //   right: SizeVariables.getWidth(context)*0.3,
+                                      // ),
+                                      child: Text(
+                                        _final_amount.toString(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2!
+                                            .copyWith(
+                                              fontSize: 30,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  height:
+                                      SizeVariables.getHeight(context) * 0.05,
+                                  padding: EdgeInsets.only(
+                                      top: SizeVariables.getHeight(context) *
+                                          0.005,
+                                      right: SizeVariables.getWidth(context) *
+                                          0.008,
+                                      bottom: SizeVariables.getHeight(context) *
+                                          0.005),
+                                  // color: Colors.green,
+                                  child:
+                                      // widget.data['status'] == 0 &&
+                                      //             widget.fromScreen == true ||
+                                      //         widget.data['status'] == -1 &&
+                                      //             widget.fromScreen == true
+                                      //     ? Container()
+                                      //     :
+                                      Container(
+                                    padding: EdgeInsets.only(
+                                      left:
+                                          SizeVariables.getWidth(context) * 0.1,
+                                    ),
+                                    child: Container(
+                                      // color: Colors.amber,
+                                      padding: EdgeInsets.only(
+                                          // left: SizeVariables.getWidth(
+                                          //     context) *
+                                          //     0.07,
+                                          ),
+                                      width: SizeVariables.getHeight(context) *
+                                          0.04,
+                                      height: SizeVariables.getHeight(context) *
+                                          0.05,
+                                      child: widget.data['status'] == 0 &&
+                                                  widget.fromScreen == true ||
+                                              widget.data['status'] == -1 &&
+                                                  widget.fromScreen == true
+                                          ? InkWell(
+                                              onTap: fCheck == true ||
+                                                      iCheck == true
+                                                  ? () => Flushbar(
+                                                        leftBarIndicatorColor:
+                                                            Colors.red,
+                                                        icon: const Icon(
+                                                            Icons.warning,
+                                                            color:
+                                                                Colors.white),
+                                                        message:
+                                                            'Please Ensure that the GST Value hasn\'t exceeded by more than 28% of the basic amount',
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 5),
+                                                      ).show(context)
+                                                  : () {
+                                                      _submitpopup(
+                                                          "submit", context);
+                                                    },
+                                              child: Lottie.asset(
+                                                  'assets/json/final_submit.json',
+                                                  fit: BoxFit.cover),
+                                            )
+                                          : widget.fromScreen == false
+                                              ? InkWell(
+                                                  onTap: fCheck == true ||
+                                                          iCheck == true
+                                                      ? () => Flushbar(
+                                                            leftBarIndicatorColor:
+                                                                Colors.red,
+                                                            icon: const Icon(
+                                                                Icons.warning,
+                                                                color: Colors
+                                                                    .white),
+                                                            message:
+                                                                'Please Ensure that the GST Value hasn\'t exceeded by more than 28% of the basic amount',
+                                                            duration:
+                                                                const Duration(
+                                                                    seconds: 5),
+                                                          ).show(context)
+                                                      : () {
+                                                          _popupApprove(
+                                                              "approval",
+                                                              context);
+                                                        },
+                                                  child: Container(
+                                                    height:
+                                                        SizeVariables.getHeight(
+                                                                context) *
+                                                            0.03,
+                                                    width:
+                                                        SizeVariables.getWidth(
+                                                                context) *
+                                                            0.15,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      color: Color.fromARGB(
+                                                          255, 232, 237, 241),
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5.0,
+                                                              right: 5.0,
+                                                              top: 2.5,
+                                                              bottom: 2.5),
+                                                      child: Center(
+                                                        child: FittedBox(
+                                                          fit: BoxFit.contain,
+                                                          child: Text(
+                                                            'Action',
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodyText1!
+                                                                .copyWith(
+                                                                    color: Colors
+                                                                        .blueAccent,
+                                                                    fontSize:
+                                                                        12),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              : Container(),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: SizeVariables.getHeight(context) * 0.02,
+                          ),
+                          Row(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _selection = 1;
+                                    Map data = {
+                                      "month": "",
+                                      "type": "incidental",
+                                      "year": "",
+                                      "user_id": "",
+                                      "all": "1" //self
+                                    };
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.grey,
+                                      width: 3,
+                                    ),
+                                  ),
+                                  child: RippleAnimation(
+                                    repeat: true,
+                                    color: Colors.grey,
+                                    minRadius: 29,
+                                    ripplesCount: 1,
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.all(5),
+                                            child: SvgPicture.asset(
+                                              "assets/travelIcon/Information.svg",
+                                              height: SizeVariables.getHeight(
+                                                      context) *
+                                                  0.03,
+                                              width: SizeVariables.getWidth(
+                                                      context) *
+                                                  0.02,
+                                            ),
+                                          ),
+                                          // SizedBox(
+                                          //     height:
+                                          //     SizeVariables.getHeight(context) *
+                                          //         0.007),
+                                          // FittedBox(
+                                          //   fit: BoxFit.contain,
+                                          //   child: Text(
+                                          //     'Info.',
+                                          //     style: Theme.of(context)
+                                          //         .textTheme
+                                          //         .bodyText1,
+                                          //   ),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                  width:
+                                      SizeVariables.getWidth(context) * 0.045),
+                              Container(
+                                // color: Colors.pink,
+                                width: SizeVariables.getWidth(context) * 0.77,
+                                height: SizeVariables.getHeight(context) * 0.1,
+                                // color: Colors.pink,
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _selection == 0
+                                            ? Colors.amber
+                                            : Colors.black,
+                                        shape: CircleBorder(),
+                                        padding: EdgeInsets.all(3),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _selection = 0;
+                                          Map data = {
+                                            "month": "",
+                                            "type": "Travel",
+                                            "year": "",
+                                            "user_id": "",
+                                            "all": "1" //self
+                                          };
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              // color: Colors.orangeAccent,
+                                              blurRadius: 2.0,
+                                              offset: const Offset(0.0, 2.0),
+                                            ),
+                                          ],
+                                        ),
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white24,
+                                          radius: 30,
+                                          // color: Colors.pink,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                  top: SizeVariables.getHeight(
+                                                          context) *
+                                                      0.015,
+                                                ),
+                                                child: SvgPicture.asset(
+                                                  "assets/travelIcon/flightbus.svg",
+                                                  height:
+                                                      SizeVariables.getHeight(
+                                                              context) *
+                                                          0.035,
+                                                  width: SizeVariables.getWidth(
+                                                          context) *
+                                                      0.05,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: SizeVariables.getHeight(context) *
+                                          0.025,
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        shape: CircleBorder(),
+                                        padding: EdgeInsets.all(3),
+                                        primary: _selection == 3
+                                            ? Colors.amber
+                                            : Colors.black,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _selection = 3;
+                                          Map data = {
+                                            "month": "",
+                                            "type": "Food",
+                                            "year": "",
+                                            "user_id": "",
+                                            "all": "3" //self
+                                          };
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              // color: Colors.orangeAccent,
+                                              blurRadius: 2.0,
+                                              offset: const Offset(0.0, 2.0),
+                                            ),
+                                          ],
+                                        ),
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white24,
+                                          radius: 30,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                  top: SizeVariables.getHeight(
+                                                          context) *
+                                                      0.015,
+                                                ),
+                                                child: SvgPicture.asset(
+                                                  "assets/travelIcon/Food.svg",
+                                                  height:
+                                                      SizeVariables.getHeight(
+                                                              context) *
+                                                          0.035,
+                                                  width: SizeVariables.getWidth(
+                                                          context) *
+                                                      0.05,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: SizeVariables.getHeight(context) *
+                                          0.025,
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        shape: CircleBorder(),
+                                        padding: EdgeInsets.all(3),
+                                        primary: _selection == 5
+                                            ? Colors.amber
+                                            : Colors.black,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _selection = 5;
+                                          Map data = {
+                                            "month": "",
+                                            "type": "incidental",
+                                            "year": "",
+                                            "user_id": "",
+                                            "all": "5" //self
+                                          };
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              // color: Colors.orangeAccent,
+                                              blurRadius: 2.0,
+                                              offset: const Offset(0.0, 2.0),
+                                            ),
+                                          ],
+                                        ),
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white24,
+                                          radius: 30,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                  top: SizeVariables.getHeight(
+                                                          context) *
+                                                      0.016,
+                                                ),
+                                                child: SvgPicture.asset(
+                                                  "assets/travelIcon/incidentals.svg",
+                                                  height:
+                                                      SizeVariables.getHeight(
+                                                              context) *
+                                                          0.035,
+                                                  width: SizeVariables.getWidth(
+                                                          context) *
+                                                      0.05,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: SizeVariables.getHeight(context) * 0.02,
+                    ),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20)),
+                        child: Container(
+                          // color: Colors.pink,
+                          decoration: const BoxDecoration(
+                              // borderRadius: BorderRadius.only(
+                              //   topRight: Radius.circular(20),
+                              //   topLeft: Radius.circular(20),
+                              //   // bottomLeft: Radius.circular(40),
+                              //   // bottomRight: Radius.circular(40),
+                              // ),
+                              color: Color.fromARGB(239, 228, 226, 226)),
+                          child: ListView(
+                            children: [
+                              _selection == 1
+                                  ?
+                                  // _infotab(valuex.iternaryDetails!.data!.data!.meetingDetails,
+                                  //     valuex.iternaryDetails!.data!.data!.approvalLog)
+                                  _infotab(conveyanceDetails, provider,
+                                      providerLimit, widget.data, travelDetails)
+                                  : SizedBox(),
+                              _selection == 0
+                                  ? _traveltab(provider, providerLimit,
+                                      widget.data['doc_no'], travelDetails)
+                                  : SizedBox(),
+                              // _selection == 2 ? _accomondationtab() : SizedBox(),
+                              _selection == 3
+                                  ? _foodtab(providerLimit,
+                                      widget.data['doc_no'], foodDetails)
+                                  : SizedBox(),
+                              // _selection == 4 ? _localtab() : SizedBox(),
+                              _selection == 5
+                                  ? _incidentaltab(providerLimit,
+                                      widget.data['doc_no'], incidentalDetails)
+                                  : SizedBox(),
+                              SizedBox(
+                                height: SizeVariables.getHeight(context) * 0.02,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+  }
+
+  _infotab(
+    Map<String, dynamic> conveyanceDetails,
+    List<String> modeOfTravel,
+    Map<String, dynamic> providerLimit,
+    Map<String, dynamic> docNo,
+    List<dynamic> travelDetails,
+  ) {
+    // final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(context).darkTheme;
+
+    // if (doc_no != null) {
+    //   // List<MeetingDetails>? meetingDetails,List<ApprovalLog>? approvalLog
+    //   // meet_to.text = meetingDetails![0].metWhom.toString();
+    // }
+    return Padding(
+      // info
+      padding: EdgeInsets.only(
+        left: SizeVariables.getWidth(context) * 0.01,
+        right: SizeVariables.getWidth(context) * 0.01,
+      ),
+      child: Container(
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 3,
+                ),
+              ),
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            top: SizeVariables.getHeight(context) * 0.02,
+                            left: SizeVariables.getWidth(context) * 0.054,
+                          ),
+                          // color: Colors.amber,
+                          child: Text(
+                            'Meeting details',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(color: Colors.black, fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Container(
+                          child: Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.account_circle_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  controller: meet_to,
+                                  keyboardType: TextInputType.text,
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Meet to whom',
+                                    // hintText: "From",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 16, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor: false,
+                                  cursorColor: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          // color: Colors.blue,
+                          child: Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.book_online_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  controller: feedback,
+                                  keyboardType: TextInputType.text,
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Feedback',
+                                    // hintText: "To",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 16, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor: false,
+                                  cursorColor: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: SizeVariables.getWidth(context) * 0.035,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Icon(Icons.handshake_outlined),
+                          ),
+                          SizedBox(
+                            width: SizeVariables.getWidth(context) * 0.02,
+                          ),
+                          Container(
+                            width: SizeVariables.getWidth(context) * 0.8,
+                            // width: 300,
+                            // height: 200,
+                            child: TextFormField(
+                              controller: travelPurpose,
+                              keyboardType: TextInputType.text,
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2,
+                                      color:
+                                          Color.fromARGB(255, 167, 164, 164)),
+                                ),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2,
+                                      color:
+                                          Color.fromARGB(255, 194, 191, 191)),
+                                ),
+                                // border: InputBorder.none,
+                                labelText: 'Purpose',
+                                // hintText: "To",
+                                // hintStyle: Theme.of(context)
+                                //     .textTheme
+                                //     .bodyText2!
+                                //     .copyWith(color: Colors.grey),
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1!
+                                    .copyWith(
+                                        fontSize: 16, color: Colors.black),
+                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2!
+                                  .copyWith(color: Colors.black),
+                              showCursor: false,
+                              cursorColor: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: SizeVariables.getHeight(context) * 0.02,
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: SizeVariables.getWidth(context) * 0.035,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Icon(Icons.handshake_outlined),
+                          ),
+                          SizedBox(
+                            width: SizeVariables.getWidth(context) * 0.02,
+                          ),
+                          Container(
+                            width: SizeVariables.getWidth(context) * 0.8,
+                            // width: 300,
+                            // height: 200,
+                            child: TextFormField(
+                              controller: purpose,
+                              keyboardType: TextInputType.text,
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2,
+                                      color:
+                                          Color.fromARGB(255, 167, 164, 164)),
+                                ),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2,
+                                      color:
+                                          Color.fromARGB(255, 194, 191, 191)),
+                                ),
+                                // border: InputBorder.none,
+                                labelText: 'Travel Purpose',
+                                // hintText: "To",
+                                // hintStyle: Theme.of(context)
+                                //     .textTheme
+                                //     .bodyText2!
+                                //     .copyWith(color: Colors.grey),
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1!
+                                    .copyWith(
+                                        fontSize: 16, color: Colors.black),
+                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyText2!
+                                  .copyWith(color: Colors.black),
+                              showCursor: false,
+                              cursorColor: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: SizeVariables.getHeight(context) * 0.02,
+                    ),
+                    // widget.data['status'] == 0 || widget.data['status'] == -1
+                    //     ? Row(
+                    //         mainAxisAlignment: MainAxisAlignment.end,
+                    //         children: [
+                    //           Container(
+                    //             padding: EdgeInsets.only(
+                    //                 right:
+                    //                     SizeVariables.getWidth(context) * 0.05),
+                    //             child: AnimatedButton(
+                    //               height: 45,
+                    //               width: 100,
+                    //               text: 'Save',
+                    //               isReverse: true,
+                    //               selectedTextColor: Colors.black,
+                    //               transitionType: TransitionType.LEFT_TO_RIGHT,
+                    //               textStyle: TextStyle(fontSize: 13),
+                    //               backgroundColor: themeProvider
+                    //                   ? Colors.black
+                    //                   : Theme.of(context)
+                    //                       .colorScheme
+                    //                       .primaryVariant,
+                    //               // backgroundColor: Colors.black,
+                    //               borderColor: themeProvider
+                    //                   ? Colors.white
+                    //                   : Theme.of(context)
+                    //                       .colorScheme
+                    //                       .primaryVariant,
+                    //               // borderColor: Colors.black,
+                    //               borderRadius: 8,
+                    //               borderWidth: 2,
+                    //               onPress: () {
+                    //                 _traveltab(modeOfTravel, providerLimit,
+                    //                     widget.data['doc_no'], travelDetails);
+                    //                 // pageTransition(
+                    //                 //     0,
+                    //                 //     modeOfTravel,
+                    //                 //     providerLimit,
+                    //                 //     docNo,
+                    //                 //     travelDetails, {}, [], {}, []);
+                    //                 // setState(() {
+                    //                 //   _selection == 0;
+                    //                 // });
+                    //                 // print(
+                    //                 //     'SELECTED VALUEEEEEEEEEEE WHEN TRANSITIONED: $_selection');
+                    //               },
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       )
+                    //     : Container()
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: SizeVariables.getHeight(context) * 0.02),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: SizeVariables.getWidth(context) * 0.05,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            'Approval Status',
+                            style:
+                                Theme.of(context).textTheme.bodyText2!.copyWith(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                    ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Container(
+                    padding: EdgeInsets.only(
+                      left: SizeVariables.getWidth(context) * 0.02,
+                      right: SizeVariables.getWidth(context) * 0.02,
+                      top: SizeVariables.getHeight(context) * 0.015,
+                      bottom: SizeVariables.getHeight(context) * 0.015,
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: conveyanceDetails['data']['reason_log'].length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            reMarksPopup(
+                                context,
+                                conveyanceDetails['data']['approval_log']
+                                    [index]);
+                          },
+                          child: Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        CircleAvatar(
+                                            radius: SizeVariables.getWidth(
+                                                    context) *
+                                                0.07,
+                                            backgroundColor: Colors.green,
+                                            backgroundImage:
+                                                //     const AssetImage(
+                                                //   'assets/img/profilePic.jpg',
+                                                // ),
+                                                NetworkImage(
+                                                    conveyanceDetails['data']
+                                                            ['food']
+                                                        ['profile_photo'])),
+                                        SizedBox(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.012,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            FittedBox(
+                                              fit: BoxFit.contain,
+                                              child: Text(
+                                                conveyanceDetails['data']
+                                                        ['reason_log'][index]
+                                                    ['emp_name'],
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText2!
+                                                    .copyWith(
+                                                      color: Colors.black,
+                                                      fontSize: 18,
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                    ),
+                                              ),
+                                            ),
+                                            FittedBox(
+                                              fit: BoxFit.contain,
+                                              child: Text(
+                                                conveyanceDetails['data']
+                                                        ['reason_log'][index]
+                                                    ['status'],
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .copyWith(
+                                                      color: Colors.green,
+                                                      fontSize: 14,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.currency_rupee_outlined,
+                                          color: Colors.black,
+                                          size: 18,
+                                        ),
+                                        FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(
+                                            conveyanceDetails['data']
+                                                ['reason_log'][index]['sum'],
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .copyWith(
+                                                  color: const Color.fromARGB(
+                                                      255, 181, 137, 4),
+                                                  fontSize: 20,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height:
+                                      SizeVariables.getHeight(context) * 0.01,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Remarks: ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1!
+                                              .copyWith(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                              ),
+                                        ),
+                                        Container(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.35,
+                                          child: Text(
+                                            conveyanceDetails['data']
+                                                                ['reason_log'][
+                                                            index]['remarks'] ==
+                                                        null ||
+                                                    conveyanceDetails['data']
+                                                                ['reason_log'][
+                                                            index]['remarks'] ==
+                                                        ''
+                                                ? 'No Remarks'
+                                                : conveyanceDetails['data']
+                                                        ['reason_log'][index]
+                                                    ['remarks'],
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .copyWith(
+                                                  color: Colors.black38,
+                                                  fontSize: 15,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: Text(
+                                        conveyanceDetails['data']['reason_log']
+                                            [index]['updated_at'],
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1!
+                                            .copyWith(
+                                              color: Colors.black,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height:
+                                      SizeVariables.getHeight(context) * 0.01,
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  height:
+                                      SizeVariables.getHeight(context) * 0.001,
+                                  color: Color.fromARGB(255, 172, 171, 171),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+            // : Container(
+            //     height: SizeVariables.getHeight(context) * 1,
+            //     child: Scrollbar(
+            //       child: ListView.builder(
+            //         physics: NeverScrollableScrollPhysics(),
+            //         // itemCount: approvalLog!.length,
+            //         itemCount:
+            //             conveyanceDetails['data']['reason_log'].length,
+
+            //         itemBuilder: (context, index) {
+            //           return Container(
+            //             height: 250,
+            //             child: TimelineTile(
+            //               endChild: Container(
+            //                 padding: EdgeInsets.only(
+            //                   top: SizeVariables.getHeight(context) * 0.03,
+            //                 ),
+            //                 // color: Color.fromARGB(239, 228, 226, 226),
+            //                 // height: 50,
+            //                 child: Accordion(
+            //                   disableScrolling: true,
+            //                   // maxOpenSections: 1,
+            //                   headerBackgroundColorOpened:
+            //                       Color.fromARGB(239, 228, 226, 226),
+            //                   scaleWhenAnimating: true,
+            //                   openAndCloseAnimation: true,
+            //                   headerPadding: const EdgeInsets.symmetric(
+            //                       vertical: 7, horizontal: 15),
+            //                   sectionOpeningHapticFeedback:
+            //                       SectionHapticFeedback.heavy,
+            //                   sectionClosingHapticFeedback:
+            //                       SectionHapticFeedback.light,
+            //                   children: [
+            //                     AccordionSection(
+            //                       contentBackgroundColor:
+            //                           Color.fromARGB(239, 228, 226, 226),
+            //                       // isO?pen: true,
+
+            //                       headerBackgroundColor:
+            //                           Color.fromARGB(239, 228, 226, 226),
+            //                       headerBackgroundColorOpened:
+            //                           Color.fromARGB(239, 228, 226, 226),
+            //                       contentBorderColor:
+            //                           Color.fromARGB(239, 228, 226, 226),
+            //                       header: Column(
+            //                         crossAxisAlignment:
+            //                             CrossAxisAlignment.start,
+            //                         children: [
+            //                           Row(
+            //                             children: [
+            //                               Container(
+            //                                 child: Icon(
+            //                                   Icons.currency_rupee_outlined,
+            //                                   color: Colors.black,
+            //                                   size: 18,
+            //                                 ),
+            //                               ),
+            //                               FittedBox(
+            //                                 fit: BoxFit.contain,
+            //                                 child: Text(
+            //                                   '₹${conveyanceDetails['data']['reason_log'][index]['sum']}',
+            //                                   style: Theme.of(context)
+            //                                       .textTheme
+            //                                       .bodyText2!
+            //                                       .copyWith(
+            //                                           color: Colors.black,
+            //                                           fontSize: 20),
+            //                                 ),
+            //                               ),
+            //                             ],
+            //                           ),
+            //                           Container(
+            //                             width: SizeVariables.getWidth(
+            //                                     context) *
+            //                                 0.3,
+            //                             decoration: BoxDecoration(
+            //                               borderRadius:
+            //                                   BorderRadius.circular(5.0),
+            //                               color: Color(0xfffe2f6ed),
+            //                             ),
+            //                             child: Padding(
+            //                               padding: const EdgeInsets.only(
+            //                                   left: 5.0,
+            //                                   right: 5.0,
+            //                                   top: 2.5,
+            //                                   bottom: 2.5),
+            //                               child: Center(
+            //                                 child: FittedBox(
+            //                                   fit: BoxFit.contain,
+            //                                   child: Text(
+            //                                     conveyanceDetails['data']
+            //                                             ['reason_log']
+            //                                         [index]['status'],
+            //                                     style: Theme.of(context)
+            //                                         .textTheme
+            //                                         .bodyText1!
+            //                                         .copyWith(
+            //                                             color: Color(
+            //                                                 0xfff26af48),
+            //                                             fontSize: 12),
+            //                                   ),
+            //                                 ),
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ],
+            //                       ),
+            //                       content: Container(
+            //                         decoration: BoxDecoration(
+            //                           borderRadius:
+            //                               BorderRadius.circular(8),
+            //                           border: Border.all(
+            //                             color: Colors.grey,
+            //                             width: 3,
+            //                           ),
+            //                         ),
+            //                         child: Column(
+            //                           children: [
+            //                             Row(
+            //                               children: [
+            //                                 Container(
+            //                                   width: SizeVariables.getWidth(
+            //                                           context) *
+            //                                       0.54,
+            //                                   child: FittedBox(
+            //                                     fit: BoxFit.contain,
+            //                                     child: Text(
+            //                                       conveyanceDetails['data']
+            //                                               ['reason_log']
+            //                                           [index]['remarks'],
+            //                                       style: Theme.of(context)
+            //                                           .textTheme
+            //                                           .bodyText1!
+            //                                           .copyWith(
+            //                                               color:
+            //                                                   Colors.black,
+            //                                               fontSize: 15),
+            //                                     ),
+            //                                   ),
+            //                                 ),
+            //                               ],
+            //                             ),
+            //                             Container(
+            //                               child: FittedBox(
+            //                                 fit: BoxFit.contain,
+            //                                 child: Text(
+            //                                   conveyanceDetails['data']
+            //                                           ['reason_log'][index]
+            //                                       ['emp_name'],
+            //                                   style: Theme.of(context)
+            //                                       .textTheme
+            //                                       .bodyText2!
+            //                                       .copyWith(
+            //                                           color: Colors.black,
+            //                                           fontSize: 15,
+            //                                           fontStyle:
+            //                                               FontStyle.italic),
+            //                                 ),
+            //                               ),
+            //                             ),
+            //                             Container(
+            //                               height: 2,
+            //                               width: SizeVariables.getWidth(
+            //                                       context) *
+            //                                   0.6,
+            //                               color: Colors.black,
+            //                             ),
+            //                             SizedBox(
+            //                               height: SizeVariables.getHeight(
+            //                                       context) *
+            //                                   0.007,
+            //                             ),
+            //                             Row(
+            //                               mainAxisAlignment:
+            //                                   MainAxisAlignment.spaceAround,
+            //                               children: [
+            //                                 Container(
+            //                                   child: FittedBox(
+            //                                     fit: BoxFit.contain,
+            //                                     child: Text(
+            //                                       conveyanceDetails['data']
+            //                                                   ['reason_log']
+            //                                               [index]
+            //                                           ['approved_at'],
+            //                                       style: Theme.of(context)
+            //                                           .textTheme
+            //                                           .bodyText1!
+            //                                           .copyWith(
+            //                                             color: Colors.black,
+            //                                           ),
+            //                                     ),
+            //                                   ),
+            //                                 ),
+            //                                 // Container(
+            //                                 //   child: FittedBox(
+            //                                 //     fit: BoxFit.contain,
+            //                                 //     child: Text(
+            //                                 //       '12:02:03',
+            //                                 //       style: Theme.of(context)
+            //                                 //           .textTheme
+            //                                 //           .bodyText1!
+            //                                 //           .copyWith(
+            //                                 //               color: Colors.black),
+            //                                 //     ),
+            //                                 //   ),
+            //                                 // ),
+            //                               ],
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       ),
+            //                       contentHorizontalPadding: 20,
+            //                       contentBorderWidth: 1,
+            //                       // onOpenSection: () => print('onOpenSection ...'),
+            //                       // onCloseSection: () => print('onCloseSection ...'),
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //               isLast: true,
+            //               isFirst: true,
+            //               indicatorStyle: IndicatorStyle(
+            //                 height: 100,
+            //                 width: 25,
+            //                 color: Colors.green,
+            //                 iconStyle: IconStyle(
+            //                   iconData: Icons.download_done,
+            //                   fontSize: 20,
+            //                 ),
+            //               ),
+            //             ),
+            //           );
+            //         },
+            //       ),
+            //     ),
+            //   ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> reMarksPopup(BuildContext context, dynamic popUp) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Remarks',
+                style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.close,
+                ),
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              popUp['remarks'],
+              style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _traveltab(List<String> modeOfTravel, Map<String, dynamic> providerLimit,
+      String docNo, List<dynamic> travelDetails) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    return Padding(
+      //travel
+      padding: EdgeInsets.only(
+        left: SizeVariables.getWidth(context) * 0.01,
+        right: SizeVariables.getWidth(context) * 0.01,
+      ),
+      child: Container(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(
+                  bottom: SizeVariables.getHeight(context) * 0.02),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                // color: Colors.red,
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 3,
+                ),
+              ),
+              child: Container(
+                // color: Colors.amber,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: SizeVariables.getWidth(context) * 0.04,
+                            top: SizeVariables.getHeight(context) * 0.02,
+                          ),
+                          // color: Colors.amber,
+                          child: Text(
+                            'Travel itinerary',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(color: Colors.black, fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: SizeVariables.getWidth(context) * 0.03,
+                      ),
+                      // color: Colors.amber,
+                      child: ChipList(
+                          listOfChipNames: modeOfTravel,
+                          activeBgColorList: [Colors.black],
+                          inactiveBgColorList: [Colors.white],
+                          activeTextColorList: [Colors.white],
+                          inactiveTextColorList: [Colors.black],
+                          listOfChipIndicesCurrentlySeclected: [
+                            _mode_of_travel
+                          ],
+                          inactiveBorderColorList: [Colors.black],
+                          extraOnToggle: (val) {
+                            setState(() {
+                              _mode_of_travel = val;
+
+                              print('MODE OF TRAVEL ID: $_mode_of_travel');
+
+                              selected_mode = modeOfTravel[val];
+                            });
+                            for (int i = 0;
+                                i < providerLimit['travel'].length;
+                                i++) {
+                              if (selected_mode ==
+                                  providerLimit['travel'][i]
+                                      ['component_name']) {
+                                setState(() {
+                                  travelLimit = providerLimit['travel'][i]
+                                      ['limit_per_km'];
+                                  travelModeId = providerLimit['travel'][i]
+                                      ['conveyance_id'];
+                                });
+                                print('Travel Limit: $travelLimit');
+                                print('Travel ID: $travelModeId');
+                              }
+                            }
+                            print('Selected Mode Of Travel: $selected_mode');
+                          }),
+                    ),
+                    selected_mode == 'Public Transport'
+                        ? Container(
+                            padding: EdgeInsets.only(
+                                left: SizeVariables.getWidth(context) * 0.05),
+                            child: Row(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      child: Icon(Icons.handshake_outlined),
+                                    ),
+                                    SizedBox(
+                                      width: SizeVariables.getWidth(context) *
+                                          0.02,
+                                    ),
+                                    Container(
+                                      width: SizeVariables.getWidth(context) *
+                                          0.78,
+                                      // width: 300,
+                                      // height: 200,
+                                      child: TextFormField(
+                                        controller: serviceprovider,
+                                        keyboardType: TextInputType.text,
+                                        readOnly: widget.data['status'] == 0 ||
+                                                widget.data['status'] == -1
+                                            ? false
+                                            : true,
+                                        decoration: InputDecoration(
+                                          // focusColor: Colors.black,
+                                          enabledBorder:
+                                              const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 2,
+                                                color: Color.fromARGB(
+                                                    255, 167, 164, 164)),
+                                          ),
+                                          focusedBorder:
+                                              const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 2,
+                                                color: Color.fromARGB(
+                                                    255, 194, 191, 191)),
+                                          ),
+                                          // border: InputBorder.none,
+                                          labelText: 'Name of Provider',
+                                          // hintText: "To",
+                                          // hintStyle: Theme.of(context)
+                                          //     .textTheme
+                                          //     .bodyText2!
+                                          //     .copyWith(color: Colors.grey),
+                                          labelStyle: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1!
+                                              .copyWith(
+                                                  fontSize: 20,
+                                                  color: Colors.black),
+                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2!
+                                            .copyWith(color: Colors.black),
+                                        showCursor:
+                                            widget.data['status'] != 0 ||
+                                                    widget.data['status'] != -1
+                                                ? false
+                                                : true,
+                                        cursorColor: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        : Container(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Container(
+                          child: Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.location_on_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  controller: from,
+                                  keyboardType: TextInputType.text,
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'From',
+                                    // hintText: "From",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 18, color: Colors.black),
+                                  ),
+                                  onTap: () {},
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor: false,
+                                  cursorColor: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              child: Icon(Icons.location_on_outlined),
+                            ),
+                            SizedBox(
+                              width: SizeVariables.getWidth(context) * 0.02,
+                            ),
+                            Container(
+                              width: SizeVariables.getWidth(context) * 0.3,
+                              // width: 300,
+                              // height: 200,
+                              child: TextFormField(
+                                controller: to,
+                                readOnly: true,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  enabledBorder: const UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color:
+                                            Color.fromARGB(255, 167, 164, 164)),
+                                  ),
+                                  focusedBorder: const UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color:
+                                            Color.fromARGB(255, 194, 191, 191)),
+                                  ),
+                                  // border: InputBorder.none,
+                                  labelText: 'To',
+                                  // hintText: "To",
+                                  // hintStyle: Theme.of(context)
+                                  //     .textTheme
+                                  //     .bodyText2!
+                                  //     .copyWith(color: Colors.grey),
+                                  labelStyle: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1!
+                                      .copyWith(
+                                          fontSize: 18, color: Colors.black),
+                                ),
+                                onTap: () {},
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(color: Colors.black),
+                                showCursor: false,
+                                cursorColor: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        isClicked == false
+                            ? Flexible(
+                                flex: 1,
+                                fit: FlexFit.tight,
+                                child: Container(
+                                  color: Colors.blue,
+                                ))
+                            : Container(
+                                padding: EdgeInsets.only(
+                                  left: SizeVariables.getWidth(context) * 0.1,
+                                ),
+                                child: Row(
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        showDatePicker(
+                                                builder: (context, child) =>
+                                                    Theme(
+                                                      data:
+                                                          ThemeData().copyWith(
+                                                        colorScheme:
+                                                            ColorScheme.dark(
+                                                          primary:
+                                                              Color(0xffF59F23),
+                                                          surface: Colors.black,
+                                                          onSurface:
+                                                              Colors.white,
+                                                        ),
+                                                        dialogBackgroundColor:
+                                                            Color.fromARGB(255,
+                                                                91, 91, 91),
+                                                      ),
+                                                      child: child!,
+                                                    ),
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime(2015),
+                                                lastDate: DateTime.now())
+                                            .then((value) {
+                                          setState(() {
+                                            // _dateTimeStart = value;
+                                            return_travel.text = dateFormat
+                                                .format(DateTime.parse(
+                                                    value.toString()));
+                                          });
+                                          // print('DATE START: $_dateTimeStart');
+                                        });
+                                      },
+                                      child: Container(
+                                        child:
+                                            Icon(Icons.calendar_month_outlined),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: SizeVariables.getWidth(context) *
+                                          0.02,
+                                    ),
+                                    Container(
+                                      width:
+                                          SizeVariables.getWidth(context) * 0.3,
+                                      // width: 300,
+                                      // height: 200,
+                                      child: TextFormField(
+                                        onTap: () {
+                                          showDatePicker(
+                                                  builder: (context, child) =>
+                                                      Theme(
+                                                        data: ThemeData()
+                                                            .copyWith(
+                                                          colorScheme:
+                                                              ColorScheme.dark(
+                                                            primary: Color(
+                                                                0xffF59F23),
+                                                            surface:
+                                                                Colors.black,
+                                                            onSurface:
+                                                                Colors.white,
+                                                          ),
+                                                          dialogBackgroundColor:
+                                                              Color.fromARGB(
+                                                                  255,
+                                                                  91,
+                                                                  91,
+                                                                  91),
+                                                        ),
+                                                        child: child!,
+                                                      ),
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2015),
+                                                  lastDate: DateTime.now())
+                                              .then((value) {
+                                            setState(() {
+                                              // _dateTimeStart = value;
+                                              return_travel.text = dateFormat
+                                                  .format(DateTime.parse(
+                                                      value.toString()));
+                                            });
+                                            // print('DATE START: $_dateTimeStart');
+                                          });
+                                        },
+                                        readOnly: true,
+                                        controller: return_travel,
+                                        keyboardType: TextInputType.text,
+                                        decoration: InputDecoration(
+                                          enabledBorder:
+                                              const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 2,
+                                                color: Color.fromARGB(
+                                                    255, 167, 164, 164)),
+                                          ),
+                                          focusedBorder:
+                                              const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 2,
+                                                color: Color.fromARGB(
+                                                    255, 194, 191, 191)),
+                                          ),
+                                          // border: InputBorder.none,
+                                          labelText: 'Return',
+                                          // hintText: "To",
+                                          // hintStyle: Theme.of(context)
+                                          //     .textTheme
+                                          //     .bodyText2!
+                                          //     .copyWith(color: Colors.grey),
+                                          labelStyle: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1!
+                                              .copyWith(
+                                                  fontSize: 18,
+                                                  color: Colors.black),
+                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2!
+                                            .copyWith(color: Colors.black),
+                                        showCursor: true,
+                                        cursorColor: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: SizeVariables.getWidth(context) * 0.04,
+                            top: SizeVariables.getHeight(context) * 0.02,
+                          ),
+                          // color: Colors.amber,
+                          child: Text(
+                            'Claim',
+                            style:
+                                Theme.of(context).textTheme.bodyText2!.copyWith(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: SizeVariables.getWidth(context) * 0.05,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.calendar_month_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.78,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  // onTap: () {
+                                  //   showDatePicker(
+                                  //           builder: (context, child) => Theme(
+                                  //                 data: ThemeData().copyWith(
+                                  //                   colorScheme: ColorScheme.dark(
+                                  //                     primary: Color(0xffF59F23),
+                                  //                     surface: Colors.black,
+                                  //                     onSurface: Colors.white,
+                                  //                   ),
+                                  //                   dialogBackgroundColor:
+                                  //                       Color.fromARGB(
+                                  //                           255, 91, 91, 91),
+                                  //                 ),
+                                  //                 child: child!,
+                                  //               ),
+                                  //           context: context,
+                                  //           initialDate: DateTime.now(),
+                                  //           firstDate: DateTime(2015),
+                                  //           lastDate: DateTime.now()
+                                  //               .add(const Duration(days: 365)))
+                                  //       .then((value) {
+                                  //     setState(() {
+                                  //       // _dateTimeStart = value;
+                                  //       tclaim_date.text = dateFormat
+                                  //           .format(DateTime.parse(value.toString()));
+                                  //     });
+                                  //     // print('DATE START: $_dateTimeStart');
+                                  //   });
+                                  // },
+                                  readOnly: true,
+                                  controller: tclaim_date,
+                                  keyboardType: TextInputType.text,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Doc date',
+                                    // hintText: "From",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 18, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor: false,
+                                  cursorColor: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    selected_mode != 'Public Transport'
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      child: const Icon(
+                                          Icons.multiple_stop_outlined),
+                                    ),
+                                    SizedBox(
+                                      width: SizeVariables.getWidth(context) *
+                                          0.02,
+                                    ),
+                                    Container(
+                                      width:
+                                          SizeVariables.getWidth(context) * 0.3,
+                                      // width: 300,
+                                      // height: 200,
+                                      child: TextFormField(
+                                        controller: distanceTravelled,
+                                        readOnly: widget.data['status'] == 0 ||
+                                                widget.data['status'] == -1
+                                            ? false
+                                            : true,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(15),
+                                        ],
+                                        onChanged: (_) {
+                                          if (distanceTravelled.text == '') {
+                                            setState(() {
+                                              tclaim_amount.text = '0.0';
+                                              tbasic_amount.text = '';
+                                            });
+                                            setState(() {
+                                              //_final_amount = double.parse(tclaim_amount.text);
+
+                                              _finalSum(
+                                                  "travel",
+                                                  details.toString(),
+                                                  tclaim_amount.text);
+                                            });
+                                          } else {
+                                            setState(() {
+                                              tclaim_amount.text =
+                                                  (double.parse(
+                                                              distanceTravelled
+                                                                  .text) *
+                                                          travelLimit)
+                                                      .toString();
+                                              tbasic_amount.text =
+                                                  (double.parse(
+                                                              distanceTravelled
+                                                                  .text) *
+                                                          travelLimit)
+                                                      .toString();
+                                            });
+                                            setState(() {
+                                              //_final_amount = double.parse(tclaim_amount.text);
+
+                                              _finalSum(
+                                                  "travel",
+                                                  details.toString(),
+                                                  tclaim_amount.text);
+                                            });
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          enabledBorder:
+                                              const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 2,
+                                                color: Color.fromARGB(
+                                                    255, 167, 164, 164)),
+                                          ),
+                                          focusedBorder:
+                                              const UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                width: 2,
+                                                color: Color.fromARGB(
+                                                    255, 194, 191, 191)),
+                                          ),
+                                          // border: InputBorder.none,
+                                          labelText: 'Distance In Km',
+                                          // hintText: "From",
+                                          // hintStyle: Theme.of(context)
+                                          //     .textTheme
+                                          //     .bodyText2!
+                                          //     .copyWith(color: Colors.grey),
+                                          labelStyle: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1!
+                                              .copyWith(
+                                                  fontSize: 18,
+                                                  color: Colors.black),
+                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2!
+                                            .copyWith(color: Colors.black),
+                                        showCursor:
+                                            widget.data['status'] == 0 ||
+                                                    widget.data['status'] == -1
+                                                ? true
+                                                : false,
+                                        cursorColor: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    child: Icon(Icons.currency_rupee_outlined),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        SizeVariables.getWidth(context) * 0.02,
+                                  ),
+                                  Container(
+                                    width:
+                                        SizeVariables.getWidth(context) * 0.3,
+                                    // width: 300,
+                                    // height: 200,
+                                    child: TextFormField(
+                                      controller: tbasic_amount,
+                                      onChanged: (_) {
+                                        if (tbasic_amount.text == '') {
+                                          setState(() {
+                                            tclaim_amount.text = '0.0';
+                                          });
+                                        } else {
+                                          setState(() {
+                                            tclaim_amount.text = (double.parse(
+                                                    tbasic_amount.text))
+                                                .toString();
+
+                                            _finalSum(
+                                                "travel",
+                                                details.toString(),
+                                                tclaim_amount.text);
+                                          });
+                                        }
+                                      },
+                                      keyboardType: TextInputType.number,
+                                      readOnly: widget.data['status'] == 0 &&
+                                                  widget.fromScreen == true ||
+                                              widget.data['status'] == -1 &&
+                                                  widget.fromScreen == true ||
+                                              widget.fromScreen == false
+                                          ? false
+                                          : true,
+                                      decoration: InputDecoration(
+                                        enabledBorder:
+                                            const UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color: Color.fromARGB(
+                                                  255, 167, 164, 164)),
+                                        ),
+                                        focusedBorder:
+                                            const UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              width: 2,
+                                              color: Color.fromARGB(
+                                                  255, 194, 191, 191)),
+                                        ),
+                                        // border: InputBorder.none,
+                                        labelText: 'Claim Amount',
+                                        // hintText: "To",
+                                        // hintStyle: Theme.of(context)
+                                        //     .textTheme
+                                        //     .bodyText2!
+                                        //     .copyWith(color: Colors.grey),
+                                        labelStyle: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1!
+                                            .copyWith(
+                                                fontSize: 18,
+                                                color: Colors.black),
+                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2!
+                                          .copyWith(color: Colors.black),
+                                      showCursor: widget.data['status'] == 0 &&
+                                                  widget.fromScreen == true ||
+                                              widget.data['status'] == -1 &&
+                                                  widget.fromScreen == true ||
+                                              widget.fromScreen == false
+                                          ? true
+                                          : false,
+                                      cursorColor: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        : Container(
+                            // color: Colors.red,
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(
+                                          left:
+                                              SizeVariables.getWidth(context) *
+                                                  0.048),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            child: const Icon(Icons.receipt),
+                                          ),
+                                          SizedBox(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.02,
+                                          ),
+                                          Container(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.76,
+                                            // width: 300,
+                                            // height: 200,
+                                            child: TextFormField(
+                                              controller: tBillNo,
+                                              readOnly: widget.data['status'] ==
+                                                              0 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.data['status'] ==
+                                                              -1 &&
+                                                          widget.fromScreen ==
+                                                              true
+                                                  ? false
+                                                  : true,
+                                              keyboardType: TextInputType.text,
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    const UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 2,
+                                                      color: Color.fromARGB(
+                                                          255, 167, 164, 164)),
+                                                ),
+                                                focusedBorder:
+                                                    const UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 2,
+                                                      color: Color.fromARGB(
+                                                          255, 194, 191, 191)),
+                                                ),
+                                                // border: InputBorder.none,
+                                                labelText: 'Bill No',
+                                                // hintText: "From",
+                                                // hintStyle: Theme.of(context)
+                                                //     .textTheme
+                                                //     .bodyText2!
+                                                //     .copyWith(color: Colors.grey),
+                                                labelStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .copyWith(
+                                                        fontSize: 18,
+                                                        color: Colors.black),
+                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText2!
+                                                  .copyWith(
+                                                      color: Colors.black),
+                                              showCursor: widget.data[
+                                                                  'status'] ==
+                                                              0 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.data['status'] ==
+                                                              -1 &&
+                                                          widget.fromScreen ==
+                                                              true
+                                                  ? true
+                                                  : false,
+                                              cursorColor: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  // color: Colors.green,
+                                  padding: EdgeInsets.only(
+                                      left: SizeVariables.getWidth(context) *
+                                          0.05),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        child: const Icon(
+                                            Icons.multiple_stop_outlined),
+                                      ),
+                                      SizedBox(
+                                        width: SizeVariables.getWidth(context) *
+                                            0.02,
+                                      ),
+                                      Container(
+                                        width: SizeVariables.getWidth(context) *
+                                            0.3,
+                                        // width: 300,
+                                        // height: 200,
+                                        child: TextFormField(
+                                          controller: distanceTravelled,
+                                          readOnly: widget.data['status'] ==
+                                                          0 &&
+                                                      widget.fromScreen ==
+                                                          true ||
+                                                  widget.data['status'] == -1 &&
+                                                      widget.fromScreen == true
+                                              ? false
+                                              : true,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            LengthLimitingTextInputFormatter(
+                                                15),
+                                          ],
+                                          onChanged: (_) {
+                                            if (distanceTravelled.text == '') {
+                                              setState(() {
+                                                tclaim_amount.text = '0.0';
+                                                tbasic_amount.text = '';
+                                              });
+                                              setState(() {
+                                                //_final_amount = double.parse(tclaim_amount.text);
+
+                                                _finalSum(
+                                                    "travel",
+                                                    details.toString(),
+                                                    tclaim_amount.text);
+                                              });
+                                            } else if (distanceTravelled.text ==
+                                                    '' &&
+                                                tgst_amount.text != '') {
+                                              setState(() {
+                                                tclaim_amount.text =
+                                                    double.parse(
+                                                            tgst_amount.text)
+                                                        .toString();
+                                                tbasic_amount.text = '';
+                                              });
+                                              setState(() {
+                                                //_final_amount = double.parse(tclaim_amount.text);
+
+                                                _finalSum(
+                                                    "travel",
+                                                    details.toString(),
+                                                    tclaim_amount.text);
+                                              });
+                                            } else {
+                                              setState(() {
+                                                tclaim_amount
+                                                    .text = (double.parse(
+                                                            distanceTravelled
+                                                                .text) *
+                                                        travelLimit)
+                                                    .toString();
+                                                tbasic_amount
+                                                    .text = (double.parse(
+                                                            distanceTravelled
+                                                                .text) *
+                                                        travelLimit)
+                                                    .toString();
+                                              });
+                                              setState(() {
+                                                //_final_amount = double.parse(tclaim_amount.text);
+
+                                                _finalSum(
+                                                    "travel",
+                                                    details.toString(),
+                                                    tclaim_amount.text);
+                                              });
+                                            }
+                                          },
+                                          decoration: InputDecoration(
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  width: 2,
+                                                  color: Color.fromARGB(
+                                                      255, 167, 164, 164)),
+                                            ),
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  width: 2,
+                                                  color: Color.fromARGB(
+                                                      255, 194, 191, 191)),
+                                            ),
+                                            // border: InputBorder.none,
+                                            labelText: 'Distance In Km',
+                                            // hintText: "From",
+                                            // hintStyle: Theme.of(context)
+                                            //     .textTheme
+                                            //     .bodyText2!
+                                            //     .copyWith(color: Colors.grey),
+                                            labelStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .copyWith(
+                                                    fontSize: 18,
+                                                    color: Colors.black),
+                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2!
+                                              .copyWith(color: Colors.black),
+                                          showCursor: widget.data['status'] ==
+                                                          0 &&
+                                                      widget.fromScreen ==
+                                                          true ||
+                                                  widget.data['status'] == -1 &&
+                                                      widget.fromScreen == true
+                                              ? true
+                                              : false,
+                                          cursorColor: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            child: Icon(Icons.book_online),
+                                          ),
+                                          SizedBox(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.02,
+                                          ),
+                                          Container(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.3,
+                                            // width: 300,
+                                            // height: 200,
+                                            child: TextFormField(
+                                              controller: tgst_no,
+                                              readOnly: widget.data['status'] ==
+                                                              0 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.data['status'] ==
+                                                              -1 &&
+                                                          widget.fromScreen ==
+                                                              true
+                                                  ? false
+                                                  : true,
+                                              keyboardType: TextInputType.text,
+                                              inputFormatters: [
+                                                LengthLimitingTextInputFormatter(
+                                                    15),
+                                              ],
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    const UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 2,
+                                                      color: Color.fromARGB(
+                                                          255, 167, 164, 164)),
+                                                ),
+                                                focusedBorder:
+                                                    const UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 2,
+                                                      color: Color.fromARGB(
+                                                          255, 194, 191, 191)),
+                                                ),
+                                                // border: InputBorder.none,
+                                                labelText: 'GST No',
+                                                // hintText: "From",
+                                                // hintStyle: Theme.of(context)
+                                                //     .textTheme
+                                                //     .bodyText2!
+                                                //     .copyWith(color: Colors.grey),
+                                                labelStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .copyWith(
+                                                        fontSize: 18,
+                                                        color: Colors.black),
+                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText2!
+                                                  .copyWith(
+                                                      color: Colors.black),
+                                              showCursor: widget.data[
+                                                                  'status'] ==
+                                                              0 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.data['status'] ==
+                                                              -1 &&
+                                                          widget.fromScreen ==
+                                                              true
+                                                  ? true
+                                                  : false,
+                                              cursorColor: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          child: Icon(
+                                              Icons.currency_rupee_outlined),
+                                        ),
+                                        SizedBox(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.02,
+                                        ),
+                                        Container(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.3,
+                                          // width: 300,
+                                          // height: 200,
+                                          child: TextFormField(
+                                            controller: tgst_amount,
+                                            readOnly: widget.data['status'] ==
+                                                            0 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.data['status'] ==
+                                                            -1 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.fromScreen == false
+                                                ? false
+                                                : true,
+                                            onChanged: (_) {
+                                              if (tgst_amount.text == '') {
+                                                setState(() {
+                                                  tclaim_amount.text =
+                                                      tbasic_amount.text;
+                                                });
+                                                setState(() {
+                                                  //_final_amount = double.parse(tclaim_amount.text);
+
+                                                  _finalSum(
+                                                      "travel",
+                                                      details.toString(),
+                                                      tclaim_amount.text);
+                                                });
+                                              } else if (tbasic_amount.text ==
+                                                      '' &&
+                                                  distanceTravelled.text ==
+                                                      '') {
+                                                setState(() {
+                                                  tclaim_amount.text =
+                                                      double.parse(
+                                                              tgst_amount.text)
+                                                          .toString();
+                                                });
+                                                setState(() {
+                                                  //_final_amount = double.parse(tclaim_amount.text);
+
+                                                  _finalSum(
+                                                      "travel",
+                                                      details.toString(),
+                                                      tclaim_amount.text);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  tclaim_amount.text =
+                                                      (double.parse(tgst_amount
+                                                                  .text) +
+                                                              double.parse(
+                                                                  tbasic_amount
+                                                                      .text))
+                                                          .toString();
+                                                });
+
+                                                setState(() {
+                                                  //_final_amount = double.parse(tclaim_amount.text);
+
+                                                  _finalSum(
+                                                      "travel",
+                                                      details.toString(),
+                                                      tclaim_amount.text);
+                                                });
+                                              }
+                                            },
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              enabledBorder:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    width: 2,
+                                                    color: Color.fromARGB(
+                                                        255, 167, 164, 164)),
+                                              ),
+                                              focusedBorder:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    width: 2,
+                                                    color: Color.fromARGB(
+                                                        255, 194, 191, 191)),
+                                              ),
+                                              // border: InputBorder.none,
+                                              labelText: 'GST Amount',
+                                              // hintText: "To",
+                                              // hintStyle: Theme.of(context)
+                                              //     .textTheme
+                                              //     .bodyText2!
+                                              //     .copyWith(color: Colors.grey),
+                                              labelStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1!
+                                                  .copyWith(
+                                                      fontSize: 18,
+                                                      color: Colors.black),
+                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .copyWith(color: Colors.black),
+                                            showCursor: widget.data['status'] ==
+                                                            0 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.data['status'] ==
+                                                            -1 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.fromScreen == false
+                                                ? true
+                                                : false,
+                                            cursorColor: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            child: Icon(
+                                                Icons.currency_rupee_outlined),
+                                          ),
+                                          SizedBox(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.02,
+                                          ),
+                                          Container(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.3,
+                                            // width: 300,
+                                            // height: 200,
+                                            child: TextFormField(
+                                              controller: tbasic_amount,
+                                              readOnly: widget.data['status'] ==
+                                                              0 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.data['status'] ==
+                                                              -1 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.fromScreen == false
+                                                  ? false
+                                                  : true,
+                                              onChanged: (content) {
+                                                if (tgst_amount.text == '') {
+                                                  setState(() {
+                                                    tclaim_amount.text =
+                                                        tbasic_amount.text;
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    tclaim_amount
+                                                        .text = (double.parse(
+                                                                tbasic_amount
+                                                                    .text) +
+                                                            double.parse(
+                                                                tgst_amount
+                                                                    .text))
+                                                        .toString();
+                                                  });
+                                                }
+                                                setState(() {
+                                                  //_final_amount = double.parse(tclaim_amount.text);
+
+                                                  _finalSum(
+                                                      "travel",
+                                                      details.toString(),
+                                                      tclaim_amount.text);
+                                                });
+                                              },
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    const UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 2,
+                                                      color: Color.fromARGB(
+                                                          255, 167, 164, 164)),
+                                                ),
+                                                focusedBorder:
+                                                    const UnderlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      width: 2,
+                                                      color: Color.fromARGB(
+                                                          255, 194, 191, 191)),
+                                                ),
+                                                // border: InputBorder.none,
+                                                labelText: 'Basic Amount',
+                                                // hintText: "From",
+                                                // hintStyle: Theme.of(context)
+                                                //     .textTheme
+                                                //     .bodyText2!
+                                                //     .copyWith(color: Colors.grey),
+                                                labelStyle: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .copyWith(
+                                                        fontSize: 18,
+                                                        color: Colors.black),
+                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText2!
+                                                  .copyWith(
+                                                      color: Colors.black),
+                                              showCursor: widget.data[
+                                                                  'status'] ==
+                                                              0 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.data['status'] ==
+                                                              -1 &&
+                                                          widget.fromScreen ==
+                                                              true ||
+                                                      widget.fromScreen == false
+                                                  ? true
+                                                  : false,
+                                              cursorColor: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          child: Icon(
+                                              Icons.currency_rupee_outlined),
+                                        ),
+                                        SizedBox(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.02,
+                                        ),
+                                        Container(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.3,
+                                          // width: 300,
+                                          // height: 200,
+                                          child: TextFormField(
+                                            readOnly: widget.data['status'] ==
+                                                            0 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.data['status'] ==
+                                                            -1 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.fromScreen == false
+                                                ? false
+                                                : true,
+                                            controller: tclaim_amount,
+                                            keyboardType: TextInputType.number,
+                                            onChanged: (_) {
+                                              _finalSum(
+                                                  "travel",
+                                                  details.toString(),
+                                                  tclaim_amount.text);
+                                            },
+                                            decoration: InputDecoration(
+                                              enabledBorder:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    width: 2,
+                                                    color: Color.fromARGB(
+                                                        255, 167, 164, 164)),
+                                              ),
+                                              focusedBorder:
+                                                  const UnderlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    width: 2,
+                                                    color: Color.fromARGB(
+                                                        255, 194, 191, 191)),
+                                              ),
+                                              // border: InputBorder.none,
+                                              labelText: 'Claim Amount',
+                                              // hintText: "To",
+                                              // hintStyle: Theme.of(context)
+                                              //     .textTheme
+                                              //     .bodyText2!
+                                              //     .copyWith(color: Colors.grey),
+                                              labelStyle: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1!
+                                                  .copyWith(
+                                                      fontSize: 18,
+                                                      color: Colors.black),
+                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .copyWith(color: Colors.black),
+                                            showCursor: widget.data['status'] ==
+                                                            0 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.data['status'] ==
+                                                            -1 &&
+                                                        widget.fromScreen ==
+                                                            true ||
+                                                    widget.fromScreen == false
+                                                ? true
+                                                : false,
+                                            cursorColor: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                    SizedBox(height: SizeVariables.getHeight(context) * 0.02),
+                    Row(
+                      // mainAxisAlignment: MainAxisAlignment.end,
+
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          fit: FlexFit.tight,
+                          child: Container(
+                            height: SizeVariables.getHeight(context) * 0.3,
+                            // color: Color.fromARGB(255, 84, 3, 52),
+                            padding: EdgeInsets.only(
+                                left: SizeVariables.getWidth(context) * 0.05,
+                                bottom:
+                                    SizeVariables.getHeight(context) * 0.02),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  // padding: EdgeInsets.only(
+                                  //     left: SizeVariables.getWidth(context) * 0.05),
+                                  // color: Colors.yellow,
+                                  margin: EdgeInsets.only(
+                                      bottom: SizeVariables.getHeight(context) *
+                                          0.02),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.visibility,
+                                                color: Colors.black),
+                                            SizedBox(
+                                                width: SizeVariables.getWidth(
+                                                        context) *
+                                                    0.02),
+                                            Text(
+                                                widget.data['status'] == 0 &&
+                                                            widget.fromScreen ==
+                                                                true ||
+                                                        widget.data['status'] ==
+                                                                -1 &&
+                                                            widget.fromScreen ==
+                                                                true
+                                                    ? 'Upload Invoice'
+                                                    : 'Invoice',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .copyWith(
+                                                        color: Colors.black,
+                                                        fontSize: 18))
+                                          ],
+                                        ),
+                                      ),
+                                      widget.fromScreen == false
+                                          ? Container(
+                                              child: Row(
+                                                children: [
+                                                  const Icon(Icons.edit,
+                                                      color: Colors.black),
+                                                  TextButton(
+                                                      onPressed: () =>
+                                                          showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  (context) =>
+                                                                      AlertDialog(
+                                                                        backgroundColor: Color.fromARGB(
+                                                                            255,
+                                                                            43,
+                                                                            43,
+                                                                            43),
+                                                                        title: Text(
+                                                                            'Please Justify Your Edit',
+                                                                            style:
+                                                                                Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 16)),
+                                                                        content:
+                                                                            Container(
+                                                                          width:
+                                                                              double.infinity,
+                                                                          height:
+                                                                              SizeVariables.getWidth(context) * 0.5,
+                                                                          // color: Colors.red,
+
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Row(
+                                                                                children: [
+                                                                                  Container(
+                                                                                    child: const Icon(
+                                                                                      Icons.edit,
+                                                                                      color: Colors.white,
+                                                                                    ),
+                                                                                  ),
+                                                                                  FittedBox(
+                                                                                    fit: BoxFit.contain,
+                                                                                    child: Text(
+                                                                                      'Reason',
+                                                                                      style: Theme.of(context).textTheme.bodyText2,
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(
+                                                                                height: SizeVariables.getHeight(context) * 0.0001,
+                                                                              ),
+                                                                              Form(
+                                                                                key: _key,
+                                                                                child: Padding(
+                                                                                  padding: EdgeInsets.only(
+                                                                                      // right: SizeVariables.getWidth(context) * 0.06,
+                                                                                      // left: SizeVariables.getWidth(context) * 0.025,
+                                                                                      top: SizeVariables.getWidth(context) * 0.04),
+                                                                                  child: ContainerStyle(
+                                                                                    // margin: const EdgeInsets.only(right: 25),
+                                                                                    height: SizeVariables.getHeight(context) * 0.16,
+                                                                                    child: Padding(
+                                                                                      padding: const EdgeInsets.all(8),
+                                                                                      child: TextFormField(
+                                                                                        controller: _reason,
+                                                                                        decoration: const InputDecoration(
+                                                                                          border: InputBorder.none,
+                                                                                          // border: OutlineInputBorder(
+                                                                                          //   borderSide: BorderSide(color: Colors.grey),
+                                                                                          // ),
+                                                                                          // fillColor: Colors.grey,
+                                                                                        ),
+                                                                                        cursorColor: Colors.white,
+                                                                                        style: Theme.of(context).textTheme.bodyText1,
+                                                                                        maxLines: 5,
+                                                                                        validator: (value) {
+                                                                                          if (value!.isEmpty || value == '') {
+                                                                                            return 'Please enter Reason';
+                                                                                          } else {
+                                                                                            add = value;
+                                                                                            return null;
+                                                                                          }
+                                                                                        },
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                              onPressed: () {
+                                                                                // print('Reason: ${editJustification.text}');
+                                                                                // print('Reason: ${_ie_basic_amt.text}');
+                                                                                // print('Reason: ${_ie_gst_amt.text}');
+                                                                                // print('Reason: ${_ie_total_amt.text}');
+                                                                                if (_key.currentState!.validate()) {
+                                                                                  Map<String, dynamic> _data = {
+                                                                                    'doc_no': widget.data['doc_no'],
+                                                                                    'claim_type': 'travel',
+                                                                                    'status': widget.refreshData['status'],
+                                                                                    'gst_amount': tgst_amount.text,
+                                                                                    'basic_amount': tbasic_amount.text,
+                                                                                    'claim_amount': tclaim_amount.text,
+                                                                                    'remarks': _reason.text
+                                                                                  };
+                                                                                  print('DATA: $_data');
+                                                                                  FocusManager.instance.primaryFocus?.unfocus();
+
+                                                                                  // Navigator.of(context).pop();
+
+                                                                                  // Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+                                                                                  //     .editIncidentalExpense(context, _data)
+                                                                                  //     .then((value) {
+                                                                                  //   setState(() {
+                                                                                  //     _reason.clear();
+                                                                                  //   });
+                                                                                  // });
+
+                                                                                  Provider.of<ClaimzFormIndividualViewModel>(context, listen: false).conveyanceManagerEdit(_data, widget.refreshData, context);
+                                                                                }
+                                                                              },
+                                                                              child: Text('Confirm', style: Theme.of(context).textTheme.bodyText1))
+                                                                        ],
+                                                                      )),
+                                                      child: Text('Edit',
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black)))
+                                                ],
+                                              ),
+                                            )
+                                          : Container()
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: tfile_link == '' &&
+                                                tfile == null &&
+                                                widget.fromScreen == false ||
+                                            tfile_link == '' && tfile == null
+                                        ? () {}
+                                        : () => showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                                  content: Container(
+                                                    height:
+                                                        SizeVariables.getHeight(
+                                                                context) *
+                                                            0.4,
+                                                    width: double.infinity,
+                                                    child: InteractiveViewer(
+                                                      // clipBehavior: Clip.none,
+                                                      // minScale: 1,
+                                                      // maxScale: 4,
+                                                      // transformationController:
+                                                      //     controller,
+                                                      // // onInteractionStart: (details) {
+                                                      // //   if (details.pointerCount < 2) return;
+                                                      // //   if (entry == null) {
+                                                      // //     showOverlay(context);
+                                                      // //   }
+                                                      // // },
+                                                      // onInteractionEnd:
+                                                      //     (details) {
+                                                      //   resetAnimation();
+                                                      // },
+                                                      child: AspectRatio(
+                                                          aspectRatio: 1,
+                                                          child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              child: tfile_link != ''
+                                                                  ? Image.network(
+                                                                      tfile_link!,
+                                                                      fit: BoxFit
+                                                                          .cover)
+                                                                  : Image.file(
+                                                                      File(tfile!
+                                                                          .path),
+                                                                      fit: BoxFit
+                                                                          .cover))),
+                                                    ),
+                                                  ),
+                                                )),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(20)),
+                                      child: Container(
+                                        width: SizeVariables.getWidth(context) *
+                                            0.4,
+                                        // color: Colors.yellow,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: Colors.grey, width: 2)),
+                                        child: widget.fromScreen == false &&
+                                                tfile_link == '' &&
+                                                tfile == null
+                                            ? Center(
+                                                child: Text('No Invoice',
+                                                    textAlign: TextAlign.center,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText1!
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.black)),
+                                              )
+                                            : tfile_link == '' && tfile == null
+                                                ? Center(
+                                                    child: Text(
+                                                        'Please Upload Invoice',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1!
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .black)),
+                                                  )
+                                                : tfile_link != ''
+                                                    ? Stack(
+                                                        children: [
+                                                          Container(
+                                                            height:
+                                                                double.infinity,
+                                                            width:
+                                                                double.infinity,
+                                                            decoration: BoxDecoration(
+                                                                image: DecorationImage(
+                                                                    fit: BoxFit
+                                                                        .fill,
+                                                                    image: NetworkImage(
+                                                                        tfile_link!))),
+                                                            // color: Colors.red,
+                                                            // child: Image.file(
+                                                            //     _ie_file.toString()
+                                                            //         as File,
+                                                            //     fit: BoxFit
+                                                            //         .cover),
+                                                          ),
+                                                          const Positioned(
+                                                            top: 2,
+                                                            right: 5,
+                                                            child: Icon(
+                                                                Icons
+                                                                    .expand_sharp,
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        ],
+                                                      )
+                                                    : Stack(
+                                                        children: [
+                                                          Container(
+                                                            height:
+                                                                double.infinity,
+                                                            width:
+                                                                double.infinity,
+                                                            decoration: BoxDecoration(
+                                                                image: DecorationImage(
+                                                                    fit: BoxFit
+                                                                        .fill,
+                                                                    image: FileImage(
+                                                                        File(tfile!
+                                                                            .path)))),
+                                                            // color: Colors.red,
+                                                            // child: Image.file(
+                                                            //     _ie_file.toString()
+                                                            //         as File,
+                                                            //     fit: BoxFit
+                                                            //         .cover),
+                                                          ),
+                                                          const Positioned(
+                                                            top: 2,
+                                                            right: 5,
+                                                            child: Icon(
+                                                                Icons
+                                                                    .expand_sharp,
+                                                                color: Colors
+                                                                    .white),
+                                                          )
+                                                        ],
+                                                      ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        widget.data['status'] == 0 ||
+                                widget.data['status'] == -1
+                            ? Container(
+                                width: 50,
+                                height: 100,
+                                // color: Colors.white,
+                                child: Column(
+                                  children: [
+                                    InkWell(
+                                      onTap: () => _upload("travel", context),
+                                      child: const Icon(
+                                        Icons.camera_alt_outlined,
+                                        size: 40,
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () =>
+                                          _uploadOne("travel", context),
+                                      child: const Icon(
+                                        Icons.browse_gallery,
+                                        size: 40,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            : Container(),
+
+                        // widget.data['status'] == 0 ||
+                        //         widget.data['status'] == -1
+                        //     ? InkWell(
+                        //         onTap: () {
+                        //           _upload("travel", context);
+                        //         },
+                        //         child: Container(
+                        //           padding: EdgeInsets.only(
+                        //             left:
+                        //                 SizeVariables.getWidth(context) * 0.01,
+                        //             top: SizeVariables.getWidth(context) * 0.01,
+                        //           ),
+                        // child: const Icon(
+                        //   Icons.camera_alt_outlined,
+                        //   size: 40,
+                        // ),
+                        //         ),
+                        //       )
+                        //     : Container(),
+                        widget.data['status'] == 0 ||
+                                widget.data['status'] == -1
+                            ? Flexible(
+                                flex: 1,
+                                fit: FlexFit.tight,
+                                child: Container(
+                                  height:
+                                      SizeVariables.getHeight(context) * 0.3,
+                                  padding: EdgeInsets.only(
+                                      bottom: SizeVariables.getHeight(context) *
+                                          0.02),
+                                  // color: Colors.red,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.only(
+                                            right: SizeVariables.getWidth(
+                                                    context) *
+                                                0.05),
+                                        child: AnimatedButton(
+                                          height: 45,
+                                          width: 100,
+                                          text: 'Save',
+                                          isReverse: true,
+                                          selectedTextColor: Colors.black,
+                                          transitionType:
+                                              TransitionType.LEFT_TO_RIGHT,
+                                          textStyle: TextStyle(fontSize: 13),
+                                          backgroundColor:
+                                              (themeProvider.darkTheme)
+                                                  ? Colors.black
+                                                  : Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary,
+                                          borderColor: (themeProvider.darkTheme)
+                                              ? Colors.white
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimary,
+                                          borderRadius: 8,
+                                          borderWidth: 2,
+                                          onPress: () {
+                                            Map<String, dynamic> data = {
+                                              'doc_no': docNo,
+                                              'mode_of_travel':
+                                                  travelModeId.toString(),
+                                              'distance':
+                                                  distanceTravelled.text,
+                                              'from': from.text,
+                                              'service_provider':
+                                                  selected_mode ==
+                                                          'Public Transport'
+                                                      ? serviceprovider.text
+                                                      : '',
+                                              'bill_no': tBillNo.text == '' ||
+                                                      tBillNo.text.isEmpty
+                                                  ? ''
+                                                  : tBillNo.text,
+                                              'gst_no': tgst_no.text,
+                                              'gst_amount': selected_mode ==
+                                                      'Public Transport'
+                                                  ? tgst_amount.text
+                                                  : '',
+                                              'claim_amount':
+                                                  tclaim_amount.text,
+                                              'basic_amount': selected_mode ==
+                                                      'Public Transport'
+                                                  ? tbasic_amount.text
+                                                  : '',
+                                              'claim_type': 'travel'
+                                            };
+
+                                            print('DATAAAAAAAAA: $data');
+
+                                            Provider.of<ClaimzFormIndividualViewModel>(
+                                                    context,
+                                                    listen: false)
+                                                .conveyanceSaveAsDraft(
+                                                    context,
+                                                    tfile == null ? '' : tfile,
+                                                    data,
+                                                    widget.dateData,
+                                                    'travel')
+                                                .then((_) {
+                                              setState(() {
+                                                _selection = 3;
+                                              });
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: SizeVariables.getWidth(context) * 0.05,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            'Approval Status',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Container(
+                    height: SizeVariables.getHeight(context) * 0.5,
+                    // color: Colors.red,
+                    child: Scrollbar(
+                      child: Scrollbar(
+                        child: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          // itemCount: approvalLog!.length,
+                          itemCount: travelDetails.length,
+
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: 250,
+                              child: TimelineTile(
+                                endChild: Container(
+                                  padding: EdgeInsets.only(
+                                    top:
+                                        SizeVariables.getHeight(context) * 0.03,
+                                  ),
+                                  // color: Color.fromARGB(239, 228, 226, 226),
+                                  // height: 50,
+                                  child: Accordion(
+                                    disableScrolling: true,
+                                    // maxOpenSections: 1,
+                                    headerBackgroundColorOpened:
+                                        Color.fromARGB(239, 228, 226, 226),
+                                    scaleWhenAnimating: true,
+                                    openAndCloseAnimation: true,
+                                    headerPadding: const EdgeInsets.symmetric(
+                                        vertical: 7, horizontal: 15),
+                                    sectionOpeningHapticFeedback:
+                                        SectionHapticFeedback.heavy,
+                                    sectionClosingHapticFeedback:
+                                        SectionHapticFeedback.light,
+                                    children: [
+                                      AccordionSection(
+                                        contentBackgroundColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        // isO?pen: true,
+
+                                        headerBackgroundColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        headerBackgroundColorOpened:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        contentBorderColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        header: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  child: Icon(
+                                                    Icons
+                                                        .currency_rupee_outlined,
+                                                    color: Colors.black,
+                                                    size: 18,
+                                                  ),
+                                                ),
+                                                FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    travelDetails[index]
+                                                        ['claim_amount'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText2!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 20),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              width: SizeVariables.getWidth(
+                                                      context) *
+                                                  0.3,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                                color: Color(0xfffe2f6ed),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 5.0,
+                                                    right: 5.0,
+                                                    top: 2.5,
+                                                    bottom: 2.5),
+                                                child: Center(
+                                                  child: FittedBox(
+                                                    fit: BoxFit.contain,
+                                                    child: Text(
+                                                      travelDetails[index]
+                                                          ['status'],
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyText1!
+                                                          .copyWith(
+                                                              color: Color(
+                                                                  0xfff26af48),
+                                                              fontSize: 12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                child: FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    travelDetails[index]
+                                                        ['emp_name'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText2!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 15,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                height: 2,
+                                                width: SizeVariables.getWidth(
+                                                        context) *
+                                                    0.6,
+                                                color: Colors.black,
+                                              ),
+                                              SizedBox(
+                                                height: SizeVariables.getHeight(
+                                                        context) *
+                                                    0.007,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Container(
+                                                    child: FittedBox(
+                                                      fit: BoxFit.contain,
+                                                      child: Text(
+                                                        travelDetails[index]
+                                                            ['updated_at'],
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1!
+                                                            .copyWith(
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Container(
+                                                  //   child: FittedBox(
+                                                  //     fit: BoxFit.contain,
+                                                  //     child: Text(
+                                                  //       '12:02:03',
+                                                  //       style: Theme.of(context)
+                                                  //           .textTheme
+                                                  //           .bodyText1!
+                                                  //           .copyWith(
+                                                  //               color: Colors.black),
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        contentHorizontalPadding: 20,
+                                        contentBorderWidth: 1,
+                                        // onOpenSection: () => print('onOpenSection ...'),
+                                        // onCloseSection: () => print('onCloseSection ...'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                isLast: true,
+                                isFirst: true,
+                                indicatorStyle: IndicatorStyle(
+                                  height: 100,
+                                  width: 25,
+                                  color: Colors.green,
+                                  iconStyle: IconStyle(
+                                    iconData: Icons.download_done,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  )
+          ],
+        ),
+      ),
+    );
+  }
+
+  _foodtab(Map<String, dynamic> food, String docNo, List<dynamic> foodDetails) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Padding(
+      padding: EdgeInsets.only(
+        left: SizeVariables.getWidth(context) * 0.01,
+        right: SizeVariables.getWidth(context) * 0.01,
+      ),
+      child: Container(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(
+                  bottom: SizeVariables.getHeight(context) * 0.02),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                // color: Colors.red,
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 3,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: SizeVariables.getWidth(context) * 0.03,
+                ),
+                child: Container(
+                  // color: Colors.pink,
+                  // height: SizeVariables.getHeight(context) * 0.83,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: SizeVariables.getWidth(context) * 0.02,
+                              top: SizeVariables.getHeight(context) * 0.02,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                'Food details',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                        color: Colors.black, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                                left: SizeVariables.getWidth(context) * 0.048),
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.account_circle_outlined),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.76,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: fserviceprovider,
+                                    keyboardType: TextInputType.text,
+                                    readOnly: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? false
+                                        : true,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'Name of provider',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              top: SizeVariables.getWidth(context) * 0.02,
+                              left: SizeVariables.getWidth(context) * 0.02,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                'Claim',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: SizeVariables.getWidth(context) * 0.05,
+                            ),
+                            child: Row(
+                              children: [
+                                InkWell(
+                                  onTap: () {},
+                                  child: Container(
+                                    child: Icon(Icons.calendar_month_outlined),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.78,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    onTap: () {},
+                                    readOnly: true,
+                                    controller: fclaim_date,
+                                    keyboardType: TextInputType.text,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'Doc. date',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                                left: SizeVariables.getWidth(context) * 0.048),
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: const Icon(Icons.receipt),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.76,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: fBillNo,
+                                    keyboardType: TextInputType.text,
+                                    readOnly: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? false
+                                        : true,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'Bill No',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.book_online),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.3,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: fgst_no,
+                                    keyboardType: TextInputType.text,
+                                    readOnly: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? false
+                                        : true,
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(15),
+                                    ],
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'GST No',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.currency_rupee_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  controller: fbasic_amount,
+                                  readOnly: widget.data['status'] == 0 &&
+                                              widget.fromScreen == true ||
+                                          widget.data['status'] == -1 &&
+                                              widget.fromScreen == true ||
+                                          widget.fromScreen == false
+                                      ? false
+                                      : true,
+                                  onChanged: (content) {
+                                    print('FOOD LIMIT: $foodLimit');
+
+                                    print('CONTENTTTTTT: $content');
+
+                                    print(
+                                        'CONTENTTTTTT Runtimetype: ${content.runtimeType}');
+
+                                    if (content == '') {
+                                      setState(() {
+                                        fclaim_amount.text = '0.0';
+                                      });
+
+                                      setState(() {
+                                        _finalSum("food", details.toString(),
+                                            fclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content != '') {
+                                      setState(() {
+                                        fclaim_amount.text = content;
+                                      });
+                                      setState(() {
+                                        _finalSum("food", details.toString(),
+                                            fclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content == '' &&
+                                        fgst_amount.text != '') {
+                                      setState(() {
+                                        fclaim_amount.text = fgst_amount.text;
+                                      });
+                                      setState(() {
+                                        _finalSum("food", details.toString(),
+                                            fclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content == '' &&
+                                        fgst_amount.text == '') {
+                                      setState(() {
+                                        fclaim_amount.text = '0.0';
+                                      });
+
+                                      setState(() {
+                                        _finalSum("food", details.toString(),
+                                            fclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (double.parse(content) > foodLimit) {
+                                      setState(() {
+                                        fbasic_amount.text =
+                                            foodLimit.toString();
+                                        fclaim_amount.text =
+                                            foodLimit.toString();
+                                      });
+                                      setState(() {
+                                        _finalSum("food", details.toString(),
+                                            fclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content != '' &&
+                                        fgst_amount.text != '') {
+                                      setState(() {
+                                        fclaim_amount
+                                            .text = (double.parse(content) +
+                                                double.parse(fgst_amount.text))
+                                            .toString();
+                                      });
+                                      setState(() {
+                                        _finalSum("food", details.toString(),
+                                            fclaim_amount.text);
+                                      });
+                                    }
+
+                                    // if (double.parse(fbasic_amount.text) < 0 &&
+                                    //     fCheck == true) {
+                                    //   setState(() {
+                                    //     fbasic_amount.text = '';
+                                    //     fclaim_amount.text = '0.0';
+                                    //   });
+                                    //   setState(() {
+                                    //     _finalSum("food", details.toString(),
+                                    //         fclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (fbasic_amount.text != '') {
+                                    //   setState(() {
+                                    //     fclaim_amount.text =
+                                    //         double.parse(fbasic_amount.text)
+                                    //             .toString();
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum("food", details.toString(),
+                                    //         fclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (fbasic_amount.text == '' &&
+                                    //     fgst_amount.text != '') {
+                                    //   setState(() {
+                                    //     fclaim_amount.text =
+                                    //         double.parse(fgst_amount.text)
+                                    //             .toString();
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum("food", details.toString(),
+                                    //         fclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (fbasic_amount.text == '' &&
+                                    //     fgst_amount.text == '') {
+                                    //   setState(() {
+                                    //     fclaim_amount.text = '0.0';
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum("food", details.toString(),
+                                    //         fclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (fbasic_amount.text != '' &&
+                                    //     fgst_amount.text != '') {
+                                    //   setState(() {
+                                    //     fclaim_amount.text = (double.parse(
+                                    //                 fbasic_amount.text) +
+                                    //             double.parse(fgst_amount.text))
+                                    //         .toString();
+                                    //   });
+                                    //   setState(() {
+                                    //     _finalSum("food", details.toString(),
+                                    //         fclaim_amount.text);
+                                    //   });
+                                    // }
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Basic Amount',
+                                    // hintText: "From",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 18, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor: widget.data['status'] == 0 &&
+                                              widget.fromScreen == true ||
+                                          widget.data['status'] == -1 &&
+                                              widget.fromScreen == true ||
+                                          widget.fromScreen == false
+                                      ? true
+                                      : false,
+                                  cursorColor: Colors.black,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.currency_rupee_outlined),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.3,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: fgst_amount,
+                                    readOnly: widget.data['status'] == 0 &&
+                                                widget.fromScreen == true ||
+                                            widget.data['status'] == -1 &&
+                                                widget.fromScreen == true ||
+                                            widget.fromScreen == false
+                                        ? false
+                                        : true,
+                                    onChanged: (gstContent) {
+                                      print('FOOD LIMIT: $foodLimit');
+
+                                      print('CONTENTTTTTT: $gstContent');
+
+                                      print(
+                                          'CONTENTTTTTT Runtimetype: ${gstContent.runtimeType}');
+
+                                      if (gstContent == '' &&
+                                          fbasic_amount.text != '') {
+                                        setState(() {
+                                          fclaim_amount.text =
+                                              fbasic_amount.text;
+                                        });
+
+                                        setState(() {
+                                          _finalSum("food", details.toString(),
+                                              fclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (gstContent == '' &&
+                                          fbasic_amount.text == '') {
+                                        setState(() {
+                                          fclaim_amount.text = '0.0';
+                                        });
+
+                                        setState(() {
+                                          _finalSum("food", details.toString(),
+                                              fclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (gstContent != '') {
+                                        setState(() {
+                                          fclaim_amount.text = gstContent;
+                                        });
+                                        setState(() {
+                                          _finalSum("food", details.toString(),
+                                              fclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (fgst_amount.text != '') {
+                                        setState(() {
+                                          fCheckValue = checkGST(
+                                              double.parse(fbasic_amount.text),
+                                              double.parse(fgst_amount.text),
+                                              context);
+                                        });
+                                      }
+
+                                      if (double.parse(gstContent) >
+                                          fCheckValue!) {
+                                        Flushbar(
+                                          leftBarIndicatorColor: Colors.red,
+                                          icon: const Icon(Icons.warning,
+                                              color: Colors.white),
+                                          message: 'GST EXCEEDED',
+                                          duration: const Duration(seconds: 2),
+                                        ).show(context);
+                                        setState(() {
+                                          fCheck = true;
+                                          print('FCHECKKKKKK: $fCheck');
+                                          // fbasic_amount.clear();
+                                          fbasic_amount.text = '';
+                                          fclaim_amount.text = '0.0';
+                                        });
+                                        setState(() {
+                                          _finalSum("food", details.toString(),
+                                              fclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (double.parse(gstContent) <=
+                                          fCheckValue!) {
+                                        setState(() {
+                                          fCheck = false;
+                                          print('FCHECKKKKKK: $fCheck');
+                                        });
+                                      }
+
+                                      if (double.parse(gstContent) +
+                                              double.parse(fbasic_amount.text) >
+                                          foodLimit) {
+                                        fclaim_amount.text =
+                                            foodLimit.toString();
+
+                                        fbasic_amount.text = (foodLimit -
+                                                double.parse(gstContent == ''
+                                                    ? '0'
+                                                    : gstContent))
+                                            .toString();
+                                      }
+
+                                      if (gstContent != '' &&
+                                          fgst_amount.text != '') {
+                                        setState(() {
+                                          fclaim_amount.text =
+                                              (double.parse(gstContent) +
+                                                      double.parse(
+                                                          fbasic_amount.text))
+                                                  .toString();
+                                        });
+                                        setState(() {
+                                          _finalSum("food", details.toString(),
+                                              fclaim_amount.text);
+                                        });
+                                      }
+
+                                      //OLD CODE
+
+                                      // if (gstContent == '' &&
+                                      //     fbasic_amount.text != '') {
+                                      //   setState(() {
+                                      //     fclaim_amount.text =
+                                      //         fbasic_amount.text;
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(gstContent) >
+                                      //     foodLimit) {
+                                      //   setState(() {
+                                      //     fbasic_amount.text =
+                                      //         foodLimit.toString();
+                                      //     fclaim_amount.text =
+                                      //         foodLimit.toString();
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      //NEW CODE
+
+                                      // print('FOOD LIMIT: $foodLimit');
+
+                                      // print('GST CONTENTTTTT: $gstContent');
+
+                                      // if (fgst_amount.text == '' &&
+                                      //     fbasic_amount.text != '') {
+                                      //   setState(() {
+                                      //     fclaim_amount.text =
+                                      //         double.parse(fbasic_amount.text)
+                                      //             .toString();
+                                      //     // fgst_amount.text = "0";
+                                      //   });
+                                      //   setState(() {
+                                      //     //_final_amount = double.parse(tclaim_amount.text);
+
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (fgst_amount.text == '' &&
+                                      //     fbasic_amount.text == '') {
+                                      //   setState(() {
+                                      //     fclaim_amount.text = '0.0';
+                                      //   });
+                                      //   setState(() {
+                                      //     //_final_amount = double.parse(tclaim_amount.text);
+
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (fgst_amount.text != '') {
+                                      //   setState(() {
+                                      //     fCheckValue = checkGST(
+                                      //         double.parse(fbasic_amount.text),
+                                      //         double.parse(fgst_amount.text),
+                                      //         context);
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(fgst_amount.text) >
+                                      //     fCheckValue!) {
+                                      //   Flushbar(
+                                      //     leftBarIndicatorColor: Colors.red,
+                                      //     icon: const Icon(Icons.warning,
+                                      //         color: Colors.white),
+                                      //     message: 'GST EXCEEDED',
+                                      //     duration: const Duration(seconds: 2),
+                                      //   ).show(context);
+                                      //   setState(() {
+                                      //     fCheck = true;
+                                      //     print('FCHECKKKKKK: $fCheck');
+                                      //     fbasic_amount.clear();
+                                      //     fclaim_amount.text = '0.0';
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(fgst_amount.text) <=
+                                      //     fCheckValue!) {
+                                      //   setState(() {
+                                      //     fCheck = false;
+                                      //     print('FCHECKKKKKK: $fCheck');
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(fclaim_amount.text) >
+                                      //     foodLimit) {
+                                      //   setState(() {
+                                      //     fclaim_amount.text =
+                                      //         foodLimit.toString();
+                                      //     fbasic_amount.text = (foodLimit -
+                                      //             double.parse(
+                                      //                 fgst_amount.text == ''
+                                      //                     ? '0'
+                                      //                     : fgst_amount.text))
+                                      //         .toString();
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (fbasic_amount.text != '' &&
+                                      //     fgst_amount.text != '') {
+                                      //   setState(() {
+                                      //     fclaim_amount.text = (double.parse(
+                                      //                 fbasic_amount.text) +
+                                      //             double.parse(
+                                      //                 fgst_amount.text))
+                                      //         .toString();
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      //OLD CODE
+                                      // else {
+                                      //   setState(() {
+                                      //     fclaim_amount.text = (double.parse(
+                                      //                 fbasic_amount.text) +
+                                      //             double.parse(
+                                      //                 fgst_amount.text))
+                                      //         .toString();
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum("food", details.toString(),
+                                      //         fclaim_amount.text);
+                                      //   });
+                                      // }
+                                    },
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'GST Amount',
+                                      // hintText: "To",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 &&
+                                                widget.fromScreen == true ||
+                                            widget.data['status'] == -1 &&
+                                                widget.fromScreen == true ||
+                                            widget.fromScreen == false
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.currency_rupee_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  // readOnly: true,
+                                  readOnly:
+                                      widget.fromScreen == true ? true : false,
+                                  controller: fclaim_amount,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _finalSum("food", details.toString(),
+                                          fclaim_amount.text);
+                                    });
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Claim Amount',
+                                    // hintText: "To",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 18, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor:
+                                      widget.fromScreen == true ? false : false,
+                                  cursorColor: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: SizeVariables.getHeight(context) * 0.02),
+                      Row(
+                        // mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Flexible(
+                            flex: 1,
+                            fit: FlexFit.tight,
+                            child: Container(
+                              height: SizeVariables.getHeight(context) * 0.3,
+                              // color: Colors.red,
+                              padding: EdgeInsets.only(
+                                  left: SizeVariables.getWidth(context) * 0.05,
+                                  bottom:
+                                      SizeVariables.getHeight(context) * 0.02),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    // padding: EdgeInsets.only(
+                                    //     left: SizeVariables.getWidth(context) * 0.05),
+                                    // color: Colors.yellow,
+                                    margin: EdgeInsets.only(
+                                        bottom:
+                                            SizeVariables.getHeight(context) *
+                                                0.02),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.visibility,
+                                                  color: Colors.black),
+                                              SizedBox(
+                                                  width: SizeVariables.getWidth(
+                                                          context) *
+                                                      0.02),
+                                              Text(
+                                                  widget.data['status'] == 0 ||
+                                                          widget.data[
+                                                                  'status'] ==
+                                                              -1
+                                                      ? 'Upload Invoice'
+                                                      : 'Invoice',
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyText1!
+                                                      .copyWith(
+                                                          color: Colors.black,
+                                                          fontSize: 18))
+                                            ],
+                                          ),
+                                        ),
+                                        widget.fromScreen == false
+                                            ? TextButton(
+                                                onPressed: () => showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (context) =>
+                                                            AlertDialog(
+                                                              backgroundColor:
+                                                                  Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          43,
+                                                                          43,
+                                                                          43),
+                                                              title: Text(
+                                                                  'Please Justify Your Edit',
+                                                                  style: Theme.of(
+                                                                          context)
+                                                                      .textTheme
+                                                                      .bodyText1!
+                                                                      .copyWith(
+                                                                          fontSize:
+                                                                              16)),
+                                                              content:
+                                                                  Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                height: SizeVariables
+                                                                        .getWidth(
+                                                                            context) *
+                                                                    0.5,
+                                                                // color: Colors.red,
+
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Row(
+                                                                      children: [
+                                                                        Container(
+                                                                          child:
+                                                                              const Icon(
+                                                                            Icons.edit,
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ),
+                                                                        FittedBox(
+                                                                          fit: BoxFit
+                                                                              .contain,
+                                                                          child:
+                                                                              Text(
+                                                                            'Reason',
+                                                                            style:
+                                                                                Theme.of(context).textTheme.bodyText2,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height: SizeVariables.getHeight(
+                                                                              context) *
+                                                                          0.0001,
+                                                                    ),
+                                                                    Form(
+                                                                      key: _key,
+                                                                      child:
+                                                                          Padding(
+                                                                        padding: EdgeInsets.only(
+                                                                            // right: SizeVariables.getWidth(context) * 0.06,
+                                                                            // left: SizeVariables.getWidth(context) * 0.025,
+                                                                            top: SizeVariables.getWidth(context) * 0.04),
+                                                                        child:
+                                                                            ContainerStyle(
+                                                                          // margin: const EdgeInsets.only(right: 25),
+                                                                          height:
+                                                                              SizeVariables.getHeight(context) * 0.16,
+                                                                          child:
+                                                                              Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.all(8),
+                                                                            child:
+                                                                                TextFormField(
+                                                                              controller: _reason,
+                                                                              decoration: const InputDecoration(
+                                                                                border: InputBorder.none,
+                                                                                // border: OutlineInputBorder(
+                                                                                //   borderSide: BorderSide(color: Colors.grey),
+                                                                                // ),
+                                                                                // fillColor: Colors.grey,
+                                                                              ),
+                                                                              cursorColor: Colors.white,
+                                                                              style: Theme.of(context).textTheme.bodyText1,
+                                                                              maxLines: 5,
+                                                                              validator: (value) {
+                                                                                if (value!.isEmpty || value == '') {
+                                                                                  return 'Please enter Reason';
+                                                                                } else {
+                                                                                  add = value;
+                                                                                  return null;
+                                                                                }
+                                                                              },
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      // print('Reason: ${editJustification.text}');
+                                                                      // print('Reason: ${_ie_basic_amt.text}');
+                                                                      // print('Reason: ${_ie_gst_amt.text}');
+                                                                      // print('Reason: ${_ie_total_amt.text}');
+                                                                      if (_key
+                                                                          .currentState!
+                                                                          .validate()) {
+                                                                        Map<String,
+                                                                                dynamic>
+                                                                            _data =
+                                                                            {
+                                                                          'doc_no':
+                                                                              widget.data['doc_no'],
+                                                                          'claim_type':
+                                                                              'food',
+                                                                          'status':
+                                                                              widget.refreshData['status'],
+                                                                          'gst_amount':
+                                                                              fgst_amount.text,
+                                                                          'basic_amount':
+                                                                              fbasic_amount.text,
+                                                                          'claim_amount':
+                                                                              fclaim_amount.text,
+                                                                          'remarks':
+                                                                              _reason.text
+                                                                        };
+                                                                        print(
+                                                                            'DATA: $_data');
+                                                                        FocusManager
+                                                                            .instance
+                                                                            .primaryFocus
+                                                                            ?.unfocus();
+
+                                                                        // Navigator.of(context).pop();
+
+                                                                        // Provider.of<ClaimzFormIndividualViewModel>(
+                                                                        //         context,
+                                                                        //         listen:
+                                                                        //             false)
+                                                                        //     .editIncidentalExpense(
+                                                                        //         context,
+                                                                        //         _data)
+                                                                        //     .then(
+                                                                        //         (value) {
+                                                                        //   setState(
+                                                                        //       () {
+                                                                        //     _reason
+                                                                        //         .clear();
+                                                                        //   });
+                                                                        // });
+                                                                        Provider.of<ClaimzFormIndividualViewModel>(context, listen: false).conveyanceManagerEdit(
+                                                                            _data,
+                                                                            widget.refreshData,
+                                                                            context);
+                                                                      }
+                                                                    },
+                                                                    child: Text(
+                                                                        'Confirm',
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .bodyText1))
+                                                              ],
+                                                            )),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.edit,
+                                                        color: Colors.black),
+                                                    Text('Edit',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black))
+                                                  ],
+                                                ))
+                                            : Container()
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () => showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                                content: Container(
+                                                  height:
+                                                      SizeVariables.getHeight(
+                                                              context) *
+                                                          0.4,
+                                                  width: double.infinity,
+                                                  child: InteractiveViewer(
+                                                    // clipBehavior: Clip.none,
+                                                    // minScale: 1,
+                                                    // maxScale: 4,
+                                                    // transformationController:
+                                                    //     controller,
+                                                    // // onInteractionStart: (details) {
+                                                    // //   if (details.pointerCount < 2) return;
+                                                    // //   if (entry == null) {
+                                                    // //     showOverlay(context);
+                                                    // //   }
+                                                    // // },
+                                                    // onInteractionEnd:
+                                                    //     (details) {
+                                                    //   resetAnimation();
+                                                    // },
+                                                    child: AspectRatio(
+                                                        aspectRatio: 1,
+                                                        child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            child: ffile_link != ''
+                                                                ? Image.network(
+                                                                    ffile_link!,
+                                                                    fit: BoxFit
+                                                                        .cover)
+                                                                : Image.file(
+                                                                    File(ffile!
+                                                                        .path),
+                                                                    fit: BoxFit
+                                                                        .cover))),
+                                                  ),
+                                                ),
+                                              )),
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(20)),
+                                        child: Container(
+                                          width:
+                                              SizeVariables.getWidth(context) *
+                                                  0.4,
+                                          // color: Colors.yellow,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey,
+                                                  width: 2)),
+                                          child:
+                                              widget.fromScreen == false &&
+                                                      ffile_link == '' &&
+                                                      ffile == null
+                                                  ? Center(
+                                                      child: Text('No Invoice',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: Theme.of(
+                                                                  context)
+                                                              .textTheme
+                                                              .bodyText1!
+                                                              .copyWith(
+                                                                  color: Colors
+                                                                      .black)),
+                                                    )
+                                                  : ffile_link == '' &&
+                                                          ffile == null
+                                                      ? Center(
+                                                          child: Text(
+                                                              'Please Upload Invoice',
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .bodyText1!
+                                                                  .copyWith(
+                                                                      color: Colors
+                                                                          .black)),
+                                                        )
+                                                      : ffile_link != ''
+                                                          ? Stack(
+                                                              children: [
+                                                                Container(
+                                                                  height: double
+                                                                      .infinity,
+                                                                  width: double
+                                                                      .infinity,
+                                                                  decoration: BoxDecoration(
+                                                                      image: DecorationImage(
+                                                                          fit: BoxFit
+                                                                              .fill,
+                                                                          image:
+                                                                              NetworkImage(ffile_link!))),
+                                                                  // color: Colors.red,
+                                                                  // child: Image.file(
+                                                                  //     _ie_file.toString()
+                                                                  //         as File,
+                                                                  //     fit: BoxFit
+                                                                  //         .cover),
+                                                                ),
+                                                                const Positioned(
+                                                                  top: 2,
+                                                                  right: 5,
+                                                                  child: Icon(
+                                                                      Icons
+                                                                          .expand_sharp,
+                                                                      color: Colors
+                                                                          .white),
+                                                                )
+                                                              ],
+                                                            )
+                                                          : Stack(
+                                                              children: [
+                                                                Container(
+                                                                  height: double
+                                                                      .infinity,
+                                                                  width: double
+                                                                      .infinity,
+                                                                  decoration: BoxDecoration(
+                                                                      image: DecorationImage(
+                                                                          fit: BoxFit
+                                                                              .fill,
+                                                                          image:
+                                                                              FileImage(File(ffile!.path)))),
+                                                                  // color: Colors.red,
+                                                                  // child: Image.file(
+                                                                  //     _ie_file.toString()
+                                                                  //         as File,
+                                                                  //     fit: BoxFit
+                                                                  //         .cover),
+                                                                ),
+                                                                const Positioned(
+                                                                  top: 2,
+                                                                  right: 5,
+                                                                  child: Icon(
+                                                                      Icons
+                                                                          .expand_sharp,
+                                                                      color: Colors
+                                                                          .white),
+                                                                )
+                                                              ],
+                                                            ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          widget.data['status'] == 0 ||
+                                  widget.data['status'] == -1
+                              ? InkWell(
+                                  onTap: () {
+                                    _upload("food", context);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      // left: SizeVariables.getWidth(context) *
+                                      //     0.001,
+                                      top: SizeVariables.getWidth(context) *
+                                          0.01,
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt_outlined,
+                                      size: 40,
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                          widget.data['status'] == 0 ||
+                                  widget.data['status'] == -1
+                              ? Flexible(
+                                  flex: 1,
+                                  fit: FlexFit.tight,
+                                  child: Container(
+                                    height:
+                                        SizeVariables.getHeight(context) * 0.3,
+                                    padding: EdgeInsets.only(
+                                        bottom:
+                                            SizeVariables.getHeight(context) *
+                                                0.02),
+                                    // color: Colors.green,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              right: SizeVariables.getWidth(
+                                                      context) *
+                                                  0.05),
+                                          child: AnimatedButton(
+                                            height: 45,
+                                            width: 100,
+                                            text: 'Save',
+                                            isReverse: true,
+                                            selectedTextColor: Colors.black,
+                                            transitionType:
+                                                TransitionType.LEFT_TO_RIGHT,
+                                            textStyle: TextStyle(fontSize: 13),
+                                            backgroundColor:
+                                                (themeProvider.darkTheme)
+                                                    ? Colors.black
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onPrimary,
+                                            borderColor:
+                                                (themeProvider.darkTheme)
+                                                    ? Colors.white
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onPrimary,
+                                            borderRadius: 8,
+                                            borderWidth: 2,
+                                            onPress: fCheck == true
+                                                ? () => Flushbar(
+                                                      leftBarIndicatorColor:
+                                                          Colors.red,
+                                                      icon: const Icon(
+                                                          Icons.warning,
+                                                          color: Colors.white),
+                                                      message:
+                                                          'Please Ensure that the GST Value hasn\'t exceeded by more than 28% of the basic amount',
+                                                      duration: const Duration(
+                                                          seconds: 5),
+                                                    ).show(context)
+                                                : () {
+                                                    Map<String, dynamic> data =
+                                                        {
+                                                      'doc_no': docNo,
+                                                      'service_provider':
+                                                          fserviceprovider.text,
+                                                      'bill_no': fBillNo.text,
+                                                      'gst_no': fgst_no.text,
+                                                      'gst_amount':
+                                                          fgst_amount.text,
+                                                      'claim_amount':
+                                                          fclaim_amount.text,
+                                                      'basic_amount':
+                                                          fbasic_amount.text,
+                                                      'claim_type': 'food'
+                                                    };
+
+                                                    Provider.of<ClaimzFormIndividualViewModel>(
+                                                            context,
+                                                            listen: false)
+                                                        .conveyanceSaveAsDraft(
+                                                            context,
+                                                            ffile == null
+                                                                ? ''
+                                                                : ffile,
+                                                            data,
+                                                            widget.dateData,
+                                                            'food')
+                                                        .then((_) {
+                                                      setState(() {
+                                                        _selection = 5;
+                                                      });
+                                                    });
+                                                  },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: SizeVariables.getWidth(context) * 0.05,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            'Approval Status',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Container(
+                    height: SizeVariables.getHeight(context) * 0.5,
+                    // color: Colors.red,
+                    child: Scrollbar(
+                      child: Scrollbar(
+                        child: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          // itemCount: approvalLog!.length,
+                          itemCount: foodDetails.length,
+
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: 250,
+                              child: TimelineTile(
+                                endChild: Container(
+                                  padding: EdgeInsets.only(
+                                    top:
+                                        SizeVariables.getHeight(context) * 0.03,
+                                  ),
+                                  // color: Color.fromARGB(239, 228, 226, 226),
+                                  // height: 50,
+                                  child: Accordion(
+                                    disableScrolling: true,
+                                    // maxOpenSections: 1,
+                                    headerBackgroundColorOpened:
+                                        Color.fromARGB(239, 228, 226, 226),
+                                    scaleWhenAnimating: true,
+                                    openAndCloseAnimation: true,
+                                    headerPadding: const EdgeInsets.symmetric(
+                                        vertical: 7, horizontal: 15),
+                                    sectionOpeningHapticFeedback:
+                                        SectionHapticFeedback.heavy,
+                                    sectionClosingHapticFeedback:
+                                        SectionHapticFeedback.light,
+                                    children: [
+                                      AccordionSection(
+                                        contentBackgroundColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        // isO?pen: true,
+
+                                        headerBackgroundColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        headerBackgroundColorOpened:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        contentBorderColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        header: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  child: Icon(
+                                                    Icons
+                                                        .currency_rupee_outlined,
+                                                    color: Colors.black,
+                                                    size: 18,
+                                                  ),
+                                                ),
+                                                FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    foodDetails[index]
+                                                        ['claim_amount'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText2!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 20),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              width: SizeVariables.getWidth(
+                                                      context) *
+                                                  0.3,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                                color: Color(0xfffe2f6ed),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 5.0,
+                                                    right: 5.0,
+                                                    top: 2.5,
+                                                    bottom: 2.5),
+                                                child: Center(
+                                                  child: FittedBox(
+                                                    fit: BoxFit.contain,
+                                                    child: Text(
+                                                      foodDetails[index]
+                                                          ['status'],
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyText1!
+                                                          .copyWith(
+                                                              color: Color(
+                                                                  0xfff26af48),
+                                                              fontSize: 12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                child: FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    foodDetails[index]
+                                                        ['emp_name'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText2!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 15,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                height: 2,
+                                                width: SizeVariables.getWidth(
+                                                        context) *
+                                                    0.6,
+                                                color: Colors.black,
+                                              ),
+                                              SizedBox(
+                                                height: SizeVariables.getHeight(
+                                                        context) *
+                                                    0.007,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Container(
+                                                    child: FittedBox(
+                                                      fit: BoxFit.contain,
+                                                      child: Text(
+                                                        foodDetails[index]
+                                                            ['updated_at'],
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1!
+                                                            .copyWith(
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Container(
+                                                  //   child: FittedBox(
+                                                  //     fit: BoxFit.contain,
+                                                  //     child: Text(
+                                                  //       '12:02:03',
+                                                  //       style: Theme.of(context)
+                                                  //           .textTheme
+                                                  //           .bodyText1!
+                                                  //           .copyWith(
+                                                  //               color: Colors.black),
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        contentHorizontalPadding: 20,
+                                        contentBorderWidth: 1,
+                                        // onOpenSection: () => print('onOpenSection ...'),
+                                        // onCloseSection: () => print('onCloseSection ...'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                isLast: true,
+                                isFirst: true,
+                                indicatorStyle: IndicatorStyle(
+                                  height: 100,
+                                  width: 25,
+                                  color: Colors.green,
+                                  iconStyle: IconStyle(
+                                    iconData: Icons.download_done,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  )
+          ],
+        ),
+      ),
+    );
+  }
+
+  _incidentaltab(Map<String, dynamic> incidental, String docNo,
+      List<dynamic> incidentalDetails) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return Padding(
+      padding: EdgeInsets.only(
+        left: SizeVariables.getWidth(context) * 0.01,
+        right: SizeVariables.getWidth(context) * 0.01,
+      ),
+      child: Container(
+        child: Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(
+                  bottom: SizeVariables.getHeight(context) * 0.02),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 3,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: SizeVariables.getWidth(context) * 0.03,
+                ),
+                child: Container(
+                  // color: Colors.pink,
+                  // height: SizeVariables.getHeight(context) * 0.83,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: SizeVariables.getWidth(context) * 0.02,
+                              top: SizeVariables.getHeight(context) * 0.02,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                'Incidental details',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                        color: Colors.black, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                                left: SizeVariables.getWidth(context) * 0.048),
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.account_circle_outlined),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.76,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: iserviceprovider,
+                                    readOnly: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? false
+                                        : true,
+                                    keyboardType: TextInputType.text,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'Name of provider',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              top: SizeVariables.getWidth(context) * 0.02,
+                              left: SizeVariables.getWidth(context) * 0.02,
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: Text(
+                                'Claim',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                              left: SizeVariables.getWidth(context) * 0.05,
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.calendar_month_outlined),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.76,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    onTap: () {},
+                                    readOnly: true,
+                                    controller: iclaim_date,
+                                    keyboardType: TextInputType.text,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'Doc. date',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Container(
+                          //   child: Row(
+                          //     children: [
+                          //       Container(
+                          //         child: Icon(Icons.account_balance_wallet_sharp),
+                          //       ),
+                          //       SizedBox(
+                          //         width: SizeVariables.getWidth(context) * 0.02,
+                          //       ),
+                          //       Container(
+                          //         width: SizeVariables.getWidth(context) * 0.3,
+                          //         // width: 300,
+                          //         // height: 200,
+                          //         child: TextFormField(
+                          //           controller: iexchangerate,
+                          //           keyboardType: TextInputType.number,
+                          //           decoration: InputDecoration(
+                          //             enabledBorder: const UnderlineInputBorder(
+                          //               borderSide: BorderSide(
+                          //                   width: 2,
+                          //                   color:
+                          //                       Color.fromARGB(255, 167, 164, 164)),
+                          //             ),
+                          //             focusedBorder: const UnderlineInputBorder(
+                          //               borderSide: BorderSide(
+                          //                   width: 2,
+                          //                   color:
+                          //                       Color.fromARGB(255, 194, 191, 191)),
+                          //             ),
+                          //             // border: InputBorder.none,
+                          //             labelText: 'Exchange rate',
+                          //             // hintText: "From",
+                          //             // hintStyle: Theme.of(context)
+                          //             //     .textTheme
+                          //             //     .bodyText2!
+                          //             //     .copyWith(color: Colors.grey),
+                          //             labelStyle: Theme.of(context)
+                          //                 .textTheme
+                          //                 .bodyText1!
+                          //                 .copyWith(
+                          //                     fontSize: 18, color: Colors.black),
+                          //           ),
+                          //           style: Theme.of(context)
+                          //               .textTheme
+                          //               .bodyText2!
+                          //               .copyWith(color: Colors.black),
+                          //           showCursor: true,
+                          //           cursorColor: Colors.black,
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(
+                                left: SizeVariables.getWidth(context) * 0.048),
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: const Icon(Icons.receipt),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.76,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: iBillNo,
+                                    readOnly: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? false
+                                        : true,
+                                    keyboardType: TextInputType.text,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'Bill No',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.book_online),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.3,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: igst_no,
+                                    readOnly: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? false
+                                        : true,
+                                    keyboardType: TextInputType.text,
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(15),
+                                    ],
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'GST No',
+                                      // hintText: "From",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 ||
+                                            widget.data['status'] == -1
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child:
+                                    const Icon(Icons.currency_rupee_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  controller: ibasic_amount,
+                                  readOnly: widget.data['status'] == 0 &&
+                                              widget.fromScreen == true ||
+                                          widget.data['status'] == -1 &&
+                                              widget.fromScreen == true ||
+                                          widget.fromScreen == false
+                                      ? false
+                                      : true,
+                                  onChanged: (content) {
+                                    if (content == '') {
+                                      setState(() {
+                                        iclaim_amount.text = '0.0';
+                                      });
+
+                                      setState(() {
+                                        _finalSum(
+                                            "incidental",
+                                            details.toString(),
+                                            iclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content != '') {
+                                      setState(() {
+                                        iclaim_amount.text = content;
+                                      });
+                                      setState(() {
+                                        _finalSum(
+                                            "incidental",
+                                            details.toString(),
+                                            iclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content == '' &&
+                                        igst_amount.text != '') {
+                                      setState(() {
+                                        iclaim_amount.text = igst_amount.text;
+                                      });
+                                      setState(() {
+                                        _finalSum(
+                                            "incidental",
+                                            details.toString(),
+                                            iclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content == '' &&
+                                        igst_amount.text == '') {
+                                      setState(() {
+                                        iclaim_amount.text = '0.0';
+                                      });
+
+                                      setState(() {
+                                        _finalSum(
+                                            "incidental",
+                                            details.toString(),
+                                            iclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (double.parse(content) >
+                                        incidentalLimit) {
+                                      setState(() {
+                                        ibasic_amount.text =
+                                            incidentalLimit.toString();
+                                        iclaim_amount.text =
+                                            incidentalLimit.toString();
+                                      });
+                                      setState(() {
+                                        _finalSum(
+                                            "incidental",
+                                            details.toString(),
+                                            iclaim_amount.text);
+                                      });
+                                    }
+
+                                    if (content != '' &&
+                                        igst_amount.text != '') {
+                                      setState(() {
+                                        iclaim_amount
+                                            .text = (double.parse(content) +
+                                                double.parse(igst_amount.text))
+                                            .toString();
+                                      });
+                                      setState(() {
+                                        _finalSum(
+                                            "incidental",
+                                            details.toString(),
+                                            iclaim_amount.text);
+                                      });
+                                    }
+
+                                    // print('FOOD LIMIT: $foodLimit');
+
+                                    // if (double.parse(ibasic_amount.text) < 0 &&
+                                    //     iCheck == true) {
+                                    //   setState(() {
+                                    //     ibasic_amount.text = '';
+                                    //     iclaim_amount.text = '0.0';
+                                    //   });
+                                    //   setState(() {
+                                    //     _finalSum(
+                                    //         "incidental",
+                                    //         details.toString(),
+                                    //         iclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (ibasic_amount.text != '') {
+                                    //   setState(() {
+                                    //     iclaim_amount.text =
+                                    //         double.parse(ibasic_amount.text)
+                                    //             .toString();
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum(
+                                    //         "incidental",
+                                    //         details.toString(),
+                                    //         iclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (ibasic_amount.text == '' &&
+                                    //     igst_amount.text != '') {
+                                    //   setState(() {
+                                    //     iclaim_amount.text =
+                                    //         double.parse(igst_amount.text)
+                                    //             .toString();
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum(
+                                    //         "incidental",
+                                    //         details.toString(),
+                                    //         iclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (ibasic_amount.text == '' &&
+                                    //     igst_amount.text == '') {
+                                    //   setState(() {
+                                    //     iclaim_amount.text = '0.0';
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum(
+                                    //         "incidental",
+                                    //         details.toString(),
+                                    //         iclaim_amount.text);
+                                    //   });
+                                    // }
+
+                                    // if (double.parse(iclaim_amount.text) >
+                                    //     incidentalLimit) {
+                                    //   setState(() {
+                                    //     ibasic_amount.text = (incidentalLimit -
+                                    //             double.parse(
+                                    //                 igst_amount.text == ''
+                                    //                     ? '0'
+                                    //                     : igst_amount.text))
+                                    //         .toString();
+                                    //     iclaim_amount.text =
+                                    //         incidentalLimit.toString();
+                                    //   });
+
+                                    //   setState(() {
+                                    //     _finalSum(
+                                    //         "incidental",
+                                    //         details.toString(),
+                                    //         iclaim_amount.text);
+                                    //   });
+                                    // }
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Basic Amount',
+                                    // hintText: "From",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 18, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor: widget.data['status'] == 0 &&
+                                              widget.fromScreen == true ||
+                                          widget.data['status'] == -1 &&
+                                              widget.fromScreen == true ||
+                                          widget.fromScreen == false
+                                      ? true
+                                      : false,
+                                  cursorColor: Colors.black,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  child: Icon(Icons.currency_rupee_outlined),
+                                ),
+                                SizedBox(
+                                  width: SizeVariables.getWidth(context) * 0.02,
+                                ),
+                                Container(
+                                  width: SizeVariables.getWidth(context) * 0.3,
+                                  // width: 300,
+                                  // height: 200,
+                                  child: TextFormField(
+                                    controller: igst_amount,
+                                    readOnly: widget.data['status'] == 0 &&
+                                                widget.fromScreen == true ||
+                                            widget.data['status'] == -1 &&
+                                                widget.fromScreen == true ||
+                                            widget.fromScreen == false
+                                        ? false
+                                        : true,
+                                    onChanged: (gstContent) {
+                                      if (gstContent == '' &&
+                                          ibasic_amount.text != '') {
+                                        setState(() {
+                                          iclaim_amount.text =
+                                              ibasic_amount.text;
+                                        });
+
+                                        setState(() {
+                                          _finalSum(
+                                              "incidental",
+                                              details.toString(),
+                                              iclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (gstContent == '' &&
+                                          ibasic_amount.text == '') {
+                                        setState(() {
+                                          iclaim_amount.text = '0.0';
+                                        });
+
+                                        setState(() {
+                                          _finalSum(
+                                              "incidental",
+                                              details.toString(),
+                                              iclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (gstContent != '') {
+                                        setState(() {
+                                          iclaim_amount.text = gstContent;
+                                        });
+                                        setState(() {
+                                          _finalSum(
+                                              "incidental",
+                                              details.toString(),
+                                              iclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (igst_amount.text != '') {
+                                        setState(() {
+                                          iCheckValue = checkGST(
+                                              double.parse(ibasic_amount.text),
+                                              double.parse(igst_amount.text),
+                                              context);
+                                        });
+                                      }
+
+                                      if (double.parse(gstContent) >
+                                          iCheckValue!) {
+                                        Flushbar(
+                                          leftBarIndicatorColor: Colors.red,
+                                          icon: const Icon(Icons.warning,
+                                              color: Colors.white),
+                                          message: 'GST EXCEEDED',
+                                          duration: const Duration(seconds: 2),
+                                        ).show(context);
+                                        setState(() {
+                                          iCheck = true;
+                                          print('FCHECKKKKKK: $iCheck');
+                                          // fbasic_amount.clear();
+                                          ibasic_amount.text = '';
+                                          iclaim_amount.text = '0.0';
+                                        });
+                                        setState(() {
+                                          _finalSum(
+                                              "incidental",
+                                              details.toString(),
+                                              iclaim_amount.text);
+                                        });
+                                      }
+
+                                      if (double.parse(gstContent) <=
+                                          iCheckValue!) {
+                                        setState(() {
+                                          iCheck = false;
+                                          print('FCHECKKKKKK: $iCheck');
+                                        });
+                                      }
+
+                                      if (double.parse(gstContent) +
+                                              double.parse(ibasic_amount.text) >
+                                          incidentalLimit) {
+                                        iclaim_amount.text =
+                                            incidentalLimit.toString();
+
+                                        ibasic_amount.text = (incidentalLimit -
+                                                double.parse(gstContent == ''
+                                                    ? '0'
+                                                    : gstContent))
+                                            .toString();
+                                      }
+
+                                      if (gstContent != '' &&
+                                          igst_amount.text != '') {
+                                        setState(() {
+                                          iclaim_amount.text =
+                                              (double.parse(gstContent) +
+                                                      double.parse(
+                                                          ibasic_amount.text))
+                                                  .toString();
+                                        });
+                                        setState(() {
+                                          _finalSum(
+                                              "incidental",
+                                              details.toString(),
+                                              iclaim_amount.text);
+                                        });
+                                      }
+
+                                      // print('FOOD LIMIT: $foodLimit');
+
+                                      // if (igst_amount.text == '' &&
+                                      //     ibasic_amount.text != '') {
+                                      //   setState(() {
+                                      //     iclaim_amount.text =
+                                      //         double.parse(ibasic_amount.text)
+                                      //             .toString();
+                                      //     // fgst_amount.text = "0";
+                                      //   });
+                                      //   setState(() {
+                                      //     //_final_amount = double.parse(tclaim_amount.text);
+
+                                      //     _finalSum(
+                                      //         "incidental",
+                                      //         details.toString(),
+                                      //         iclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (igst_amount.text == '' &&
+                                      //     ibasic_amount.text == '') {
+                                      //   setState(() {
+                                      //     iclaim_amount.text = '0.0';
+                                      //   });
+                                      //   setState(() {
+                                      //     //_final_amount = double.parse(tclaim_amount.text);
+
+                                      //     _finalSum(
+                                      //         "incidental",
+                                      //         details.toString(),
+                                      //         iclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (igst_amount.text != '') {
+                                      //   setState(() {
+                                      //     iCheckValue = checkGST(
+                                      //         double.parse(ibasic_amount.text),
+                                      //         double.parse(igst_amount.text),
+                                      //         context);
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(igst_amount.text) >
+                                      //     iCheckValue!) {
+                                      //   Flushbar(
+                                      //     leftBarIndicatorColor: Colors.red,
+                                      //     icon: const Icon(Icons.warning,
+                                      //         color: Colors.white),
+                                      //     message: 'GST EXCEEDED',
+                                      //     duration: const Duration(seconds: 2),
+                                      //   ).show(context);
+                                      //   setState(() {
+                                      //     iCheck = true;
+                                      //     print('FCHECKKKKKK: $iCheck');
+                                      //     ibasic_amount.clear();
+                                      //     iclaim_amount.text = '0.0';
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum(
+                                      //         "incidental",
+                                      //         details.toString(),
+                                      //         iclaim_amount.text);
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(igst_amount.text) <=
+                                      //     iCheckValue!) {
+                                      //   setState(() {
+                                      //     iCheck = false;
+                                      //     print('FCHECKKKKKK: $iCheck');
+                                      //   });
+                                      // }
+
+                                      // if (double.parse(iclaim_amount.text) >
+                                      //     incidentalLimit) {
+                                      //   setState(() {
+                                      //     iclaim_amount.text =
+                                      //         incidentalLimit.toString();
+                                      //     ibasic_amount
+                                      //         .text = (incidentalLimit -
+                                      //             double.parse(
+                                      //                 igst_amount.text == ''
+                                      //                     ? '0'
+                                      //                     : igst_amount.text))
+                                      //         .toString();
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum(
+                                      //         "incidental",
+                                      //         details.toString(),
+                                      //         iclaim_amount.text);
+                                      //   });
+                                      // } else {
+                                      //   setState(() {
+                                      //     iclaim_amount.text = (double.parse(
+                                      //                 ibasic_amount.text) +
+                                      //             double.parse(
+                                      //                 igst_amount.text))
+                                      //         .toString();
+                                      //   });
+                                      //   setState(() {
+                                      //     _finalSum(
+                                      //         "incidental",
+                                      //         details.toString(),
+                                      //         iclaim_amount.text);
+                                      //   });
+                                      // }
+                                    },
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      enabledBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 167, 164, 164)),
+                                      ),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            width: 2,
+                                            color: Color.fromARGB(
+                                                255, 194, 191, 191)),
+                                      ),
+                                      // border: InputBorder.none,
+                                      labelText: 'GST Amount',
+                                      // hintText: "To",
+                                      // hintStyle: Theme.of(context)
+                                      //     .textTheme
+                                      //     .bodyText2!
+                                      //     .copyWith(color: Colors.grey),
+                                      labelStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1!
+                                          .copyWith(
+                                              fontSize: 18,
+                                              color: Colors.black),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText2!
+                                        .copyWith(color: Colors.black),
+                                    showCursor: widget.data['status'] == 0 &&
+                                                widget.fromScreen == true ||
+                                            widget.data['status'] == -1 &&
+                                                widget.fromScreen == true ||
+                                            widget.fromScreen == false
+                                        ? true
+                                        : false,
+                                    cursorColor: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child: Icon(Icons.currency_rupee_outlined),
+                              ),
+                              SizedBox(
+                                width: SizeVariables.getWidth(context) * 0.02,
+                              ),
+                              Container(
+                                width: SizeVariables.getWidth(context) * 0.3,
+                                // width: 300,
+                                // height: 200,
+                                child: TextFormField(
+                                  readOnly:
+                                      widget.fromScreen == false ? false : true,
+                                  controller: iclaim_amount,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _finalSum(
+                                          "incidental",
+                                          details.toString(),
+                                          iclaim_amount.text);
+                                    });
+                                  },
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    enabledBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 167, 164, 164)),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2,
+                                          color: Color.fromARGB(
+                                              255, 194, 191, 191)),
+                                    ),
+                                    // border: InputBorder.none,
+                                    labelText: 'Claim Amount',
+                                    // hintText: "To",
+                                    // hintStyle: Theme.of(context)
+                                    //     .textTheme
+                                    //     .bodyText2!
+                                    //     .copyWith(color: Colors.grey),
+                                    labelStyle: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .copyWith(
+                                            fontSize: 18, color: Colors.black),
+                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText2!
+                                      .copyWith(color: Colors.black),
+                                  showCursor:
+                                      widget.fromScreen == false ? true : false,
+                                  cursorColor: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: SizeVariables.getHeight(context) * 0.02),
+                      Row(
+                        // mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Flexible(
+                              flex: 1,
+                              fit: FlexFit.tight,
+                              child: Container(
+                                height: SizeVariables.getHeight(context) * 0.3,
+                                // color: Colors.red,
+                                padding: EdgeInsets.only(
+                                    left:
+                                        SizeVariables.getWidth(context) * 0.05,
+                                    bottom: SizeVariables.getHeight(context) *
+                                        0.02),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      // padding: EdgeInsets.only(
+                                      //     left: SizeVariables.getWidth(context) * 0.05),
+                                      // color: Colors.yellow,
+                                      margin: EdgeInsets.only(
+                                          bottom:
+                                              SizeVariables.getHeight(context) *
+                                                  0.02),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.visibility,
+                                                    color: Colors.black),
+                                                SizedBox(
+                                                    width:
+                                                        SizeVariables.getWidth(
+                                                                context) *
+                                                            0.02),
+                                                Text(
+                                                    widget.data['status'] ==
+                                                                0 ||
+                                                            widget.data[
+                                                                    'status'] ==
+                                                                -1
+                                                        ? 'Upload Invoice'
+                                                        : 'Invoice',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText1!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 18))
+                                              ],
+                                            ),
+                                          ),
+                                          widget.fromScreen == false
+                                              ? TextButton(
+                                                  onPressed: () => showDialog(
+                                                      context: context,
+                                                      builder:
+                                                          (context) =>
+                                                              AlertDialog(
+                                                                backgroundColor:
+                                                                    Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            43,
+                                                                            43,
+                                                                            43),
+                                                                title: Text(
+                                                                    'Please Justify Your Edit',
+                                                                    style: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .bodyText1!
+                                                                        .copyWith(
+                                                                            fontSize:
+                                                                                16)),
+                                                                content:
+                                                                    Container(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  height: SizeVariables
+                                                                          .getWidth(
+                                                                              context) *
+                                                                      0.5,
+                                                                  // color: Colors.red,
+
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            child:
+                                                                                const Icon(
+                                                                              Icons.edit,
+                                                                              color: Colors.white,
+                                                                            ),
+                                                                          ),
+                                                                          FittedBox(
+                                                                            fit:
+                                                                                BoxFit.contain,
+                                                                            child:
+                                                                                Text(
+                                                                              'Reason',
+                                                                              style: Theme.of(context).textTheme.bodyText2,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height: SizeVariables.getHeight(context) *
+                                                                            0.0001,
+                                                                      ),
+                                                                      Form(
+                                                                        key:
+                                                                            _key,
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: EdgeInsets.only(
+                                                                              // right: SizeVariables.getWidth(context) * 0.06,
+                                                                              // left: SizeVariables.getWidth(context) * 0.025,
+                                                                              top: SizeVariables.getWidth(context) * 0.04),
+                                                                          child:
+                                                                              ContainerStyle(
+                                                                            // margin: const EdgeInsets.only(right: 25),
+                                                                            height:
+                                                                                SizeVariables.getHeight(context) * 0.16,
+                                                                            child:
+                                                                                Padding(
+                                                                              padding: const EdgeInsets.all(8),
+                                                                              child: TextFormField(
+                                                                                controller: _reason,
+                                                                                decoration: const InputDecoration(
+                                                                                  border: InputBorder.none,
+                                                                                  // border: OutlineInputBorder(
+                                                                                  //   borderSide: BorderSide(color: Colors.grey),
+                                                                                  // ),
+                                                                                  // fillColor: Colors.grey,
+                                                                                ),
+                                                                                cursorColor: Colors.white,
+                                                                                style: Theme.of(context).textTheme.bodyText1,
+                                                                                maxLines: 5,
+                                                                                validator: (value) {
+                                                                                  if (value!.isEmpty || value == '') {
+                                                                                    return 'Please enter Reason';
+                                                                                  } else {
+                                                                                    add = value;
+                                                                                    return null;
+                                                                                  }
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        // print('Reason: ${editJustification.text}');
+                                                                        // print('Reason: ${_ie_basic_amt.text}');
+                                                                        // print('Reason: ${_ie_gst_amt.text}');
+                                                                        // print('Reason: ${_ie_total_amt.text}');
+
+                                                                        if (_key
+                                                                            .currentState!
+                                                                            .validate()) {
+                                                                          Map<String, dynamic>
+                                                                              _data =
+                                                                              {
+                                                                            'doc_no':
+                                                                                widget.data['doc_no'],
+                                                                            'claim_type':
+                                                                                'incidental',
+                                                                            'status':
+                                                                                widget.refreshData['status'],
+                                                                            'gst_amount':
+                                                                                igst_amount.text,
+                                                                            'basic_amount':
+                                                                                ibasic_amount.text,
+                                                                            'claim_amount':
+                                                                                iclaim_amount.text,
+                                                                            'remarks':
+                                                                                _reason.text
+                                                                          };
+                                                                          print(
+                                                                              'DATA: $_data');
+                                                                          FocusManager
+                                                                              .instance
+                                                                              .primaryFocus
+                                                                              ?.unfocus();
+
+                                                                          // Navigator.of(context).pop();
+
+                                                                          // Provider.of<ClaimzFormIndividualViewModel>(context, listen: false)
+                                                                          //     .editIncidentalExpense(context, _data)
+                                                                          //     .then((value) {
+                                                                          //   setState(() {
+                                                                          //     _reason.clear();
+                                                                          //   });
+                                                                          // });
+                                                                          Provider.of<ClaimzFormIndividualViewModel>(context, listen: false).conveyanceManagerEdit(
+                                                                              _data,
+                                                                              widget.refreshData,
+                                                                              context);
+                                                                        }
+                                                                      },
+                                                                      child: Text(
+                                                                          'Confirm',
+                                                                          style: Theme.of(context)
+                                                                              .textTheme
+                                                                              .bodyText1))
+                                                                ],
+                                                              )),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(Icons.edit,
+                                                          color: Colors.black),
+                                                      Text('Edit',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black))
+                                                    ],
+                                                  ),
+                                                )
+                                              : Container()
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                                  content: Container(
+                                                    height:
+                                                        SizeVariables.getHeight(
+                                                                context) *
+                                                            0.4,
+                                                    width: double.infinity,
+                                                    child: InteractiveViewer(
+                                                      // clipBehavior: Clip.none,
+                                                      // minScale: 1,
+                                                      // maxScale: 4,
+                                                      // transformationController:
+                                                      //     controller,
+                                                      // // onInteractionStart: (details) {
+                                                      // //   if (details.pointerCount < 2) return;
+                                                      // //   if (entry == null) {
+                                                      // //     showOverlay(context);
+                                                      // //   }
+                                                      // // },
+                                                      // onInteractionEnd:
+                                                      //     (details) {
+                                                      //   resetAnimation();
+                                                      // },
+                                                      child: AspectRatio(
+                                                          aspectRatio: 1,
+                                                          child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              child: ifile_link != ''
+                                                                  ? Image.network(
+                                                                      ifile_link!,
+                                                                      fit: BoxFit
+                                                                          .cover)
+                                                                  : Image.file(
+                                                                      File(ifile!
+                                                                          .path),
+                                                                      fit: BoxFit
+                                                                          .cover))),
+                                                    ),
+                                                  ),
+                                                )),
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20)),
+                                          child: Container(
+                                            width: SizeVariables.getWidth(
+                                                    context) *
+                                                0.4,
+                                            // color: Colors.yellow,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey,
+                                                    width: 2)),
+                                            child:
+                                                widget.fromScreen == false &&
+                                                        ffile_link == '' &&
+                                                        ffile == null
+                                                    ? Center(
+                                                        child: Text(
+                                                            'No Invoice',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .bodyText1!
+                                                                .copyWith(
+                                                                    color: Colors
+                                                                        .black)),
+                                                      )
+                                                    : ifile_link == '' &&
+                                                            ifile == null
+                                                        ? Center(
+                                                            child: Text(
+                                                                'Please Upload Invoice',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .bodyText1!
+                                                                    .copyWith(
+                                                                        color: Colors
+                                                                            .black)),
+                                                          )
+                                                        : ifile_link != ''
+                                                            ? Stack(
+                                                                children: [
+                                                                  Container(
+                                                                    height: double
+                                                                        .infinity,
+                                                                    width: double
+                                                                        .infinity,
+                                                                    decoration: BoxDecoration(
+                                                                        image: DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.fill,
+                                                                            image: NetworkImage(ifile_link!))),
+                                                                    // color: Colors.red,
+                                                                    // child: Image.file(
+                                                                    //     _ie_file.toString()
+                                                                    //         as File,
+                                                                    //     fit: BoxFit
+                                                                    //         .cover),
+                                                                  ),
+                                                                  const Positioned(
+                                                                    top: 2,
+                                                                    right: 5,
+                                                                    child: Icon(
+                                                                        Icons
+                                                                            .expand_sharp,
+                                                                        color: Colors
+                                                                            .white),
+                                                                  )
+                                                                ],
+                                                              )
+                                                            : Stack(
+                                                                children: [
+                                                                  Container(
+                                                                    height: double
+                                                                        .infinity,
+                                                                    width: double
+                                                                        .infinity,
+                                                                    decoration: BoxDecoration(
+                                                                        image: DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.fill,
+                                                                            image: FileImage(File(ifile!.path)))),
+                                                                    // color: Colors.red,
+                                                                    // child: Image.file(
+                                                                    //     _ie_file.toString()
+                                                                    //         as File,
+                                                                    //     fit: BoxFit
+                                                                    //         .cover),
+                                                                  ),
+                                                                  const Positioned(
+                                                                    top: 2,
+                                                                    right: 5,
+                                                                    child: Icon(
+                                                                        Icons
+                                                                            .expand_sharp,
+                                                                        color: Colors
+                                                                            .white),
+                                                                  )
+                                                                ],
+                                                              ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )),
+                          widget.data['status'] == 0 ||
+                                  widget.data['status'] == -1
+                              ? InkWell(
+                                  onTap: () {
+                                    _upload("incidental", context);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      // left: SizeVariables.getWidth(context) *
+                                      //     0.34,
+                                      top: SizeVariables.getWidth(context) *
+                                          0.01,
+                                    ),
+                                    child: Icon(
+                                      Icons.camera_alt_outlined,
+                                      size: 40,
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                          widget.data['status'] == 0 ||
+                                  widget.data['status'] == -1
+                              ? Flexible(
+                                  flex: 1,
+                                  fit: FlexFit.tight,
+                                  child: Container(
+                                    height:
+                                        SizeVariables.getHeight(context) * 0.3,
+                                    padding: EdgeInsets.only(
+                                        bottom:
+                                            SizeVariables.getHeight(context) *
+                                                0.02),
+                                    // color: Colors.green,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              right: SizeVariables.getWidth(
+                                                      context) *
+                                                  0.05),
+                                          child: AnimatedButton(
+                                            height: 45,
+                                            width: 100,
+                                            text: 'Save',
+                                            isReverse: true,
+                                            selectedTextColor: Colors.black,
+                                            transitionType:
+                                                TransitionType.LEFT_TO_RIGHT,
+                                            textStyle: TextStyle(fontSize: 13),
+                                            backgroundColor:
+                                                (themeProvider.darkTheme)
+                                                    ? Colors.black
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onPrimary,
+                                            borderColor:
+                                                (themeProvider.darkTheme)
+                                                    ? Colors.white
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onPrimary,
+                                            borderRadius: 8,
+                                            borderWidth: 2,
+                                            onPress: iCheck == true
+                                                ? () => Flushbar(
+                                                      leftBarIndicatorColor:
+                                                          Colors.red,
+                                                      icon: const Icon(
+                                                          Icons.warning,
+                                                          color: Colors.white),
+                                                      message:
+                                                          'Please Ensure that the GST Value hasn\'t exceeded by more than 28% of the basic amount',
+                                                      duration: const Duration(
+                                                          seconds: 5),
+                                                    ).show(context)
+                                                : () {
+                                                    Map<String, dynamic> data =
+                                                        {
+                                                      'doc_no': docNo,
+                                                      'service_provider':
+                                                          iserviceprovider.text,
+                                                      'bill_no': iBillNo.text,
+                                                      'gst_no': igst_no.text,
+                                                      'gst_amount':
+                                                          igst_amount.text,
+                                                      'claim_amount':
+                                                          iclaim_amount.text,
+                                                      'basic_amount':
+                                                          ibasic_amount.text,
+                                                      'claim_type': 'incidental'
+                                                    };
+
+                                                    Provider.of<ClaimzFormIndividualViewModel>(
+                                                            context,
+                                                            listen: false)
+                                                        .conveyanceSaveAsDraft(
+                                                            context,
+                                                            ifile == null
+                                                                ? ''
+                                                                : ifile,
+                                                            data,
+                                                            widget.dateData,
+                                                            'incidental');
+                                                  },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.end,
+                      //   children: [
+                      //     Container(
+                      //       padding: EdgeInsets.only(
+                      //           right: SizeVariables.getWidth(context) * 0.05),
+                      //       child: AnimatedButton(
+                      //         height: 45,
+                      //         width: 100,
+                      //         text: 'Save',
+                      //         isReverse: true,
+                      //         selectedTextColor: Colors.black,
+                      //         transitionType: TransitionType.LEFT_TO_RIGHT,
+                      //         textStyle: TextStyle(fontSize: 13),
+                      //         backgroundColor: Colors.black,
+                      //         borderColor: Colors.white,
+                      //         borderRadius: 8,
+                      //         borderWidth: 2,
+                      //         onPress: () {},
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(
+                          left: SizeVariables.getWidth(context) * 0.05,
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            'Approval Status',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+            widget.data['status'] == -1 || widget.fromScreen == false
+                ? Container()
+                : Container(
+                    height: SizeVariables.getHeight(context) * 0.5,
+                    // color: Colors.red,
+                    child: Scrollbar(
+                      child: Scrollbar(
+                        child: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          // itemCount: approvalLog!.length,
+                          itemCount: incidentalDetails.length,
+
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: 250,
+                              child: TimelineTile(
+                                endChild: Container(
+                                  padding: EdgeInsets.only(
+                                    top:
+                                        SizeVariables.getHeight(context) * 0.03,
+                                  ),
+                                  // color: Color.fromARGB(239, 228, 226, 226),
+                                  // height: 50,
+                                  child: Accordion(
+                                    disableScrolling: true,
+                                    // maxOpenSections: 1,
+                                    headerBackgroundColorOpened:
+                                        Color.fromARGB(239, 228, 226, 226),
+                                    scaleWhenAnimating: true,
+                                    openAndCloseAnimation: true,
+                                    headerPadding: const EdgeInsets.symmetric(
+                                        vertical: 7, horizontal: 15),
+                                    sectionOpeningHapticFeedback:
+                                        SectionHapticFeedback.heavy,
+                                    sectionClosingHapticFeedback:
+                                        SectionHapticFeedback.light,
+                                    children: [
+                                      AccordionSection(
+                                        contentBackgroundColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        // isO?pen: true,
+
+                                        headerBackgroundColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        headerBackgroundColorOpened:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        contentBorderColor:
+                                            Color.fromARGB(239, 228, 226, 226),
+                                        header: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  child: Icon(
+                                                    Icons
+                                                        .currency_rupee_outlined,
+                                                    color: Colors.black,
+                                                    size: 18,
+                                                  ),
+                                                ),
+                                                FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    incidentalDetails[index]
+                                                        ['claim_amount'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText2!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 20),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Container(
+                                              width: SizeVariables.getWidth(
+                                                      context) *
+                                                  0.3,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5.0),
+                                                color: Color(0xfffe2f6ed),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 5.0,
+                                                    right: 5.0,
+                                                    top: 2.5,
+                                                    bottom: 2.5),
+                                                child: Center(
+                                                  child: FittedBox(
+                                                    fit: BoxFit.contain,
+                                                    child: Text(
+                                                      incidentalDetails[index]
+                                                          ['status'],
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyText1!
+                                                          .copyWith(
+                                                              color: Color(
+                                                                  0xfff26af48),
+                                                              fontSize: 12),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                child: FittedBox(
+                                                  fit: BoxFit.contain,
+                                                  child: Text(
+                                                    incidentalDetails[index]
+                                                        ['emp_name'],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyText2!
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 15,
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                height: 2,
+                                                width: SizeVariables.getWidth(
+                                                        context) *
+                                                    0.6,
+                                                color: Colors.black,
+                                              ),
+                                              SizedBox(
+                                                height: SizeVariables.getHeight(
+                                                        context) *
+                                                    0.007,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Container(
+                                                    child: FittedBox(
+                                                      fit: BoxFit.contain,
+                                                      child: Text(
+                                                        incidentalDetails[index]
+                                                            ['updated_at'],
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodyText1!
+                                                            .copyWith(
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Container(
+                                                  //   child: FittedBox(
+                                                  //     fit: BoxFit.contain,
+                                                  //     child: Text(
+                                                  //       '12:02:03',
+                                                  //       style: Theme.of(context)
+                                                  //           .textTheme
+                                                  //           .bodyText1!
+                                                  //           .copyWith(
+                                                  //               color: Colors.black),
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        contentHorizontalPadding: 20,
+                                        contentBorderWidth: 1,
+                                        // onOpenSection: () => print('onOpenSection ...'),
+                                        // onCloseSection: () => print('onCloseSection ...'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                isLast: true,
+                                isFirst: true,
+                                indicatorStyle: IndicatorStyle(
+                                  height: 100,
+                                  width: 25,
+                                  color: Colors.green,
+                                  iconStyle: IconStyle(
+                                    iconData: Icons.download_done,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  )
+            // Container(
+            //   height: SizeVariables.getHeight(context) * 1,
+            //   child: Scrollbar(
+            //     child: ListView.builder(
+            //       physics: NeverScrollableScrollPhysics(),
+            //       // itemCount: approvalLog!.length,
+            //       itemCount: incidentalDetails.length,
+
+            //       itemBuilder: (context, index) {
+            //         return Container(
+            //           height: 250,
+            //           child: TimelineTile(
+            //             endChild: Container(
+            //               padding: EdgeInsets.only(
+            //                 top: SizeVariables.getHeight(context) * 0.03,
+            //               ),
+            //               // color: Color.fromARGB(239, 228, 226, 226),
+            //               // height: 50,
+            //               child: Accordion(
+            //                 disableScrolling: true,
+            //                 // maxOpenSections: 1,
+            //                 headerBackgroundColorOpened:
+            //                     Color.fromARGB(239, 228, 226, 226),
+            //                 scaleWhenAnimating: true,
+            //                 openAndCloseAnimation: true,
+            //                 headerPadding: const EdgeInsets.symmetric(
+            //                     vertical: 7, horizontal: 15),
+            //                 sectionOpeningHapticFeedback:
+            //                     SectionHapticFeedback.heavy,
+            //                 sectionClosingHapticFeedback:
+            //                     SectionHapticFeedback.light,
+            //                 children: [
+            //                   AccordionSection(
+            //                     contentBackgroundColor:
+            //                         Color.fromARGB(239, 228, 226, 226),
+            //                     // isO?pen: true,
+
+            //                     headerBackgroundColor:
+            //                         Color.fromARGB(239, 228, 226, 226),
+            //                     headerBackgroundColorOpened:
+            //                         Color.fromARGB(239, 228, 226, 226),
+            //                     contentBorderColor:
+            //                         Color.fromARGB(239, 228, 226, 226),
+            //                     header: Column(
+            //                       crossAxisAlignment: CrossAxisAlignment.start,
+            //                       children: [
+            //                         Row(
+            //                           children: [
+            //                             Container(
+            //                               child: Icon(
+            //                                 Icons.currency_rupee_outlined,
+            //                                 color: Colors.black,
+            //                                 size: 18,
+            //                               ),
+            //                             ),
+            //                             FittedBox(
+            //                               fit: BoxFit.contain,
+            //                               child: Text(
+            //                                 '₹${incidentalDetails[index]['sum']}',
+            //                                 style: Theme.of(context)
+            //                                     .textTheme
+            //                                     .bodyText2!
+            //                                     .copyWith(
+            //                                         color: Colors.black,
+            //                                         fontSize: 20),
+            //                               ),
+            //                             ),
+            //                           ],
+            //                         ),
+            //                         Container(
+            //                           width:
+            //                               SizeVariables.getWidth(context) * 0.3,
+            //                           decoration: BoxDecoration(
+            //                             borderRadius:
+            //                                 BorderRadius.circular(5.0),
+            //                             color: Color(0xfffe2f6ed),
+            //                           ),
+            //                           child: Padding(
+            //                             padding: const EdgeInsets.only(
+            //                                 left: 5.0,
+            //                                 right: 5.0,
+            //                                 top: 2.5,
+            //                                 bottom: 2.5),
+            //                             child: Center(
+            //                               child: FittedBox(
+            //                                 fit: BoxFit.contain,
+            //                                 child: Text(
+            //                                   incidentalDetails[index]['status'],
+            //                                   style: Theme.of(context)
+            //                                       .textTheme
+            //                                       .bodyText1!
+            //                                       .copyWith(
+            //                                           color: Color(0xfff26af48),
+            //                                           fontSize: 12),
+            //                                 ),
+            //                               ),
+            //                             ),
+            //                           ),
+            //                         ),
+            //                       ],
+            //                     ),
+            //                     content: Container(
+            //                       decoration: BoxDecoration(
+            //                         borderRadius: BorderRadius.circular(8),
+            //                         border: Border.all(
+            //                           color: Colors.grey,
+            //                           width: 3,
+            //                         ),
+            //                       ),
+            //                       child: Column(
+            //                         children: [
+            //                           Row(
+            //                             children: [
+            //                               Container(
+            //                                 width: SizeVariables.getWidth(
+            //                                         context) *
+            //                                     0.54,
+            //                                 child: FittedBox(
+            //                                   fit: BoxFit.contain,
+            //                                   child: Text(
+            //                                     incidentalDetails[index]
+            //                                                 ['remarks'] ==
+            //                                             null
+            //                                         ? ''
+            //                                         : incidentalDetails[index]
+            //                                             ['remarks'],
+            //                                     style: Theme.of(context)
+            //                                         .textTheme
+            //                                         .bodyText1!
+            //                                         .copyWith(
+            //                                             color: Colors.black,
+            //                                             fontSize: 15),
+            //                                   ),
+            //                                 ),
+            //                               ),
+            //                             ],
+            //                           ),
+            //                           Container(
+            //                             child: FittedBox(
+            //                               fit: BoxFit.contain,
+            //                               child: Text(
+            //                                 incidentalDetails[index]['emp_name'],
+            //                                 style: Theme.of(context)
+            //                                     .textTheme
+            //                                     .bodyText2!
+            //                                     .copyWith(
+            //                                         color: Colors.black,
+            //                                         fontSize: 15,
+            //                                         fontStyle:
+            //                                             FontStyle.italic),
+            //                               ),
+            //                             ),
+            //                           ),
+            //                           Container(
+            //                             height: 2,
+            //                             width: SizeVariables.getWidth(context) *
+            //                                 0.6,
+            //                             color: Colors.black,
+            //                           ),
+            //                           SizedBox(
+            //                             height:
+            //                                 SizeVariables.getHeight(context) *
+            //                                     0.007,
+            //                           ),
+            //                           Row(
+            //                             mainAxisAlignment:
+            //                                 MainAxisAlignment.spaceAround,
+            //                             children: [
+            //                               Container(
+            //                                 child: FittedBox(
+            //                                   fit: BoxFit.contain,
+            //                                   child: Text(
+            //                                     incidentalDetails[index]
+            //                                         ['updated_at'],
+            //                                     style: Theme.of(context)
+            //                                         .textTheme
+            //                                         .bodyText1!
+            //                                         .copyWith(
+            //                                           color: Colors.black,
+            //                                         ),
+            //                                   ),
+            //                                 ),
+            //                               ),
+            //                               // Container(
+            //                               //   child: FittedBox(
+            //                               //     fit: BoxFit.contain,
+            //                               //     child: Text(
+            //                               //       '12:02:03',
+            //                               //       style: Theme.of(context)
+            //                               //           .textTheme
+            //                               //           .bodyText1!
+            //                               //           .copyWith(
+            //                               //               color: Colors.black),
+            //                               //     ),
+            //                               //   ),
+            //                               // ),
+            //                             ],
+            //                           ),
+            //                         ],
+            //                       ),
+            //                     ),
+            //                     contentHorizontalPadding: 20,
+            //                     contentBorderWidth: 1,
+            //                     // onOpenSection: () => print('onOpenSection ...'),
+            //                     // onCloseSection: () => print('onCloseSection ...'),
+            //                   ),
+            //                 ],
+            //               ),
+            //             ),
+            //             isLast: true,
+            //             isFirst: true,
+            //             indicatorStyle: IndicatorStyle(
+            //               height: 100,
+            //               width: 25,
+            //               color: Colors.green,
+            //               iconStyle: IconStyle(
+            //                 iconData: Icons.download_done,
+            //                 fontSize: 20,
+            //               ),
+            //             ),
+            //           ),
+            //         );
+            //       },
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _errorVal(BuildContext context) {
+    Flushbar(
+      message: "please provide image",
+      icon: Icon(
+        Icons.warning_amber_outlined,
+        size: 28.0,
+        color: Colors.red,
+      ),
+      duration: Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.red,
+    )..show(context);
+  }
+
+  void _imageCaptured(BuildContext context) {
+    Flushbar(
+      message: "Image has been captured !",
+      icon: Icon(
+        Icons.info_outline,
+        size: 28.0,
+        color: Colors.blue,
+      ),
+      duration: Duration(seconds: 3),
+      leftBarIndicatorColor: Colors.blue,
+    )..show(context);
+  }
+
+  _upload(String type, BuildContext context) async {
+    if (type == "travel") {
+      // var imagePath = await EdgeDetection.detectEdge.then((value) {
+      //   print(value.toString());
+      //   if (value == null) {
+      //     _errorVal(context);
+      //   } else {
+      //     _imageCaptured(context);
+      //   }
+      //   return value;
+      // });
+
+      // setState(() {
+      //   tfile = XFile(File(imagePath.toString()).path);
+      // });
+      // String imagePath = join((await getApplicationSupportDirectory()).path,
+      //     "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+
+      // bool success = await EdgeDetection.detectEdge(
+      //   imagePath,
+      //   canUseGallery: true,
+      //   androidScanTitle: 'Scanning', // use custom localizations for android
+      //   androidCropTitle: 'Crop',
+      //   androidCropBlackWhiteTitle: 'Black White',
+      //   androidCropReset: 'Reset',
+      // );
+
+      // setState(() {
+      //   tfile = new XFile(new File(imagePath.toString()).path);
+      //   // aorgfile_link = null;
+      // });
+
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+      if (image == null) return;
+
+      // imageTemporary = cropSquareImage(File(image.path));
+
+      File? imageTemporary = File(image.path);
+
+      imageTemporary = await cropImage(imageTemporary);
+
+      setState(() {
+        tfile = imageTemporary;
+        // isLoading = false;
+        // isGallery = true;
+      });
+    } else if (type == "food") {
+      // var imagePath = await EdgeDetection.detectEdge.then((value) {
+      //   print(value.toString());
+      //   if (value == null) {
+      //     _errorVal(context);
+      //   } else {
+      //     _imageCaptured(context);
+      //   }
+      //   return value;
+      // });
+      // setState(() {
+      //   ffile = XFile(File(imagePath.toString()).path);
+      // });
+
+      // String imagePath = join((await getApplicationSupportDirectory()).path,
+      //     "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+
+      // bool success = await EdgeDetection.detectEdge(
+      //   imagePath,
+      //   canUseGallery: true,
+      //   androidScanTitle: 'Scanning', // use custom localizations for android
+      //   androidCropTitle: 'Crop',
+      //   androidCropBlackWhiteTitle: 'Black White',
+      //   androidCropReset: 'Reset',
+      // );
+
+      // setState(() {
+      //   tfile = new XFile(new File(imagePath.toString()).path);
+      //   // aorgfile_link = null;
+      // });
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (image == null) return;
+
+      // imageTemporary = cropSquareImage(File(image.path));
+
+      File? imageTemporary = File(image.path);
+
+      imageTemporary = await cropImage(imageTemporary);
+
+      setState(() {
+        ffile = imageTemporary;
+        // isLoading = false;
+        // isGallery = true;
+      });
+    } else if (type == "incidental") {
+      // var imagePath = await EdgeDetection.detectEdge.then((value) {
+      //   print(value.toString());
+      //   if (value == null) {
+      //     _errorVal(context);
+      //   } else {
+      //     _imageCaptured(context);
+      //   }
+      //   return value;
+      // });
+
+      // setState(() {
+      //   ifile = XFile(File(imagePath.toString()).path);
+      // });
+
+      // String imagePath = join((await getApplicationSupportDirectory()).path,
+      //     "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+
+      // bool success = await EdgeDetection.detectEdge(
+      //   imagePath,
+      //   canUseGallery: true,
+      //   androidScanTitle: 'Scanning', // use custom localizations for android
+      //   androidCropTitle: 'Crop',
+      //   androidCropBlackWhiteTitle: 'Black White',
+      //   androidCropReset: 'Reset',
+      // );
+
+      // setState(() {
+      //   ifile = new XFile(new File(imagePath.toString()).path);
+      //   // aorgfile_link = null;
+      // });
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      if (image == null) return;
+
+      // imageTemporary = cropSquareImage(File(image.path));
+
+      File? imageTemporary = File(image.path);
+
+      imageTemporary = await cropImage(imageTemporary);
+
+      setState(() {
+        ifile = imageTemporary;
+        // isLoading = false;
+        // isGallery = true;
+      });
+    }
+    // return showDialog(
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     backgroundColor: Color.fromARGB(255, 103, 103, 101),
+    //     title: Container(
+    //       child: Column(
+    //         children: [
+    //           Container(
+    //             child: FittedBox(
+    //               fit: BoxFit.contain,
+    //               child: Text(
+    //                 'Upload your document',
+    //                 style: Theme.of(context)
+    //                     .textTheme
+    //                     .bodyText2!
+    //                     .copyWith(fontSize: 18),
+    //               ),
+    //             ),
+    //           ),
+    //           Container(
+    //             padding: EdgeInsets.only(
+    //               left: SizeVariables.getWidth(context) * 0.1,
+    //               top: SizeVariables.getHeight(context) * 0.06,
+    //               // bottom: SizeVariables.getHeight(context) * 0.1,
+    //             ),
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 Container(
+    //                   child: Column(
+    //                     children: [
+    //                       Container(
+    //                         child: Row(
+    //                           children: [
+    //                             InkWell(
+    //                               onTap: () async {
+    //                                 if (type == "travel") {
+    //                                   var imagePath = await EdgeDetection
+    //                                       .detectEdge
+    //                                       .then((value) {
+    //                                     print(value.toString());
+    //                                     if (value == null) {
+    //                                       _errorVal(context);
+    //                                     } else {
+    //                                       _imageCaptured(context);
+    //                                     }
+    //                                     return value;
+    //                                   });
+
+    //                                   setState(() {
+    //                                     tfile = XFile(
+    //                                         File(imagePath.toString()).path);
+    //                                   });
+    //                                 } else if (type == "food") {
+    //                                   var imagePath = await EdgeDetection
+    //                                       .detectEdge
+    //                                       .then((value) {
+    //                                     print(value.toString());
+    //                                     if (value == null) {
+    //                                       _errorVal(context);
+    //                                     } else {
+    //                                       _imageCaptured(context);
+    //                                     }
+    //                                     return value;
+    //                                   });
+    //                                   setState(() {
+    //                                     ffile = XFile(
+    //                                         File(imagePath.toString()).path);
+    //                                   });
+    //                                 } else if (type == "incidental") {
+    //                                   var imagePath = await EdgeDetection
+    //                                       .detectEdge
+    //                                       .then((value) {
+    //                                     print(value.toString());
+    //                                     if (value == null) {
+    //                                       _errorVal(context);
+    //                                     } else {
+    //                                       _imageCaptured(context);
+    //                                     }
+    //                                     return value;
+    //                                   });
+
+    //                                   setState(() {
+    //                                     ifile = XFile(
+    //                                         File(imagePath.toString()).path);
+    //                                   });
+    //                                 }
+    //                               },
+    //                               child: Icon(
+    //                                 Icons.camera_alt,
+    //                                 color: Colors.white,
+    //                                 size: 30,
+    //                               ),
+    //                             ),
+    //                             SizedBox(
+    //                               width: SizeVariables.getWidth(context) * 0.01,
+    //                             ),
+    //                             InkWell(
+    //                               onTap: () async {
+    //                                 // tfile = (await FilePicker.platform
+    //                                 //     .pickFiles()) as i.XFile?;
+    //                               },
+    //                               child: Icon(
+    //                                 Icons.file_copy_outlined,
+    //                                 color: Colors.white,
+    //                                 size: 30,
+    //                               ),
+    //                             ),
+    //                           ],
+    //                         ),
+    //                       ),
+    //                       Container(
+    //                         child: FittedBox(
+    //                           fit: BoxFit.contain,
+    //                           child: Text(
+    //                             'Invoice',
+    //                             style: Theme.of(context)
+    //                                 .textTheme
+    //                                 .bodyText1!
+    //                                 .copyWith(
+    //                                     color: const Color.fromARGB(
+    //                                         255, 230, 217, 217)),
+    //                           ),
+    //                         ),
+    //                       ),
+    //                     ],
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //           )
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+  }
+
+  _uploadOne(String type, BuildContext context) async {
+    if (type == "travel") {
+      // var imagePath = await EdgeDetection.detectEdge.then((value) {
+      //   print(value.toString());
+      //   if (value == null) {
+      //     _errorVal(context);
+      //   } else {
+      //     _imageCaptured(context);
+      //   }
+      //   return value;
+      // });
+
+      // setState(() {
+      //   tfile = XFile(File(imagePath.toString()).path);
+      // });
+      // String imagePath = join((await getApplicationSupportDirectory()).path,
+      //     "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+
+      // bool success = await EdgeDetection.detectEdge(
+      //   imagePath,
+      //   canUseGallery: true,
+      //   androidScanTitle: 'Scanning', // use custom localizations for android
+      //   androidCropTitle: 'Crop',
+      //   androidCropBlackWhiteTitle: 'Black White',
+      //   androidCropReset: 'Reset',
+      // );
+
+      // setState(() {
+      //   tfile = new XFile(new File(imagePath.toString()).path);
+      //   // aorgfile_link = null;
+      // });
+
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      // imageTemporary = cropSquareImage(File(image.path));
+
+      File? imageTemporary = File(image.path);
+
+      imageTemporary = await cropImage(imageTemporary);
+
+      setState(() {
+        tfile = imageTemporary;
+        // isLoading = false;
+        // isGallery = true;
+      });
+    } else if (type == "food") {
+      // var imagePath = await EdgeDetection.detectEdge.then((value) {
+      //   print(value.toString());
+      //   if (value == null) {
+      //     _errorVal(context);
+      //   } else {
+      //     _imageCaptured(context);
+      //   }
+      //   return value;
+      // });
+      // setState(() {
+      //   ffile = XFile(File(imagePath.toString()).path);
+      // });
+
+      // String imagePath = join((await getApplicationSupportDirectory()).path,
+      //     "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+
+      // bool success = await EdgeDetection.detectEdge(
+      //   imagePath,
+      //   canUseGallery: true,
+      //   androidScanTitle: 'Scanning', // use custom localizations for android
+      //   androidCropTitle: 'Crop',
+      //   androidCropBlackWhiteTitle: 'Black White',
+      //   androidCropReset: 'Reset',
+      // );
+
+      // setState(() {
+      //   tfile = new XFile(new File(imagePath.toString()).path);
+      //   // aorgfile_link = null;
+      // });
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      // imageTemporary = cropSquareImage(File(image.path));
+
+      File? imageTemporary = File(image.path);
+
+      imageTemporary = await cropImage(imageTemporary);
+
+      setState(() {
+        ffile = imageTemporary;
+        // isLoading = false;
+        // isGallery = true;
+      });
+    } else if (type == "incidental") {
+      // var imagePath = await EdgeDetection.detectEdge.then((value) {
+      //   print(value.toString());
+      //   if (value == null) {
+      //     _errorVal(context);
+      //   } else {
+      //     _imageCaptured(context);
+      //   }
+      //   return value;
+      // });
+
+      // setState(() {
+      //   ifile = XFile(File(imagePath.toString()).path);
+      // });
+
+      // String imagePath = join((await getApplicationSupportDirectory()).path,
+      //     "${(DateTime.now().millisecondsSinceEpoch / 1000).round()}.jpeg");
+
+      // bool success = await EdgeDetection.detectEdge(
+      //   imagePath,
+      //   canUseGallery: true,
+      //   androidScanTitle: 'Scanning', // use custom localizations for android
+      //   androidCropTitle: 'Crop',
+      //   androidCropBlackWhiteTitle: 'Black White',
+      //   androidCropReset: 'Reset',
+      // );
+
+      // setState(() {
+      //   ifile = new XFile(new File(imagePath.toString()).path);
+      //   // aorgfile_link = null;
+      // });
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image == null) return;
+
+      // imageTemporary = cropSquareImage(File(image.path));
+
+      File? imageTemporary = File(image.path);
+
+      imageTemporary = await cropImage(imageTemporary);
+
+      setState(() {
+        ifile = imageTemporary;
+        // isLoading = false;
+        // isGallery = true;
+      });
+    }
+    // return showDialog(
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     backgroundColor: Color.fromARGB(255, 103, 103, 101),
+    //     title: Container(
+    //       child: Column(
+    //         children: [
+    //           Container(
+    //             child: FittedBox(
+    //               fit: BoxFit.contain,
+    //               child: Text(
+    //                 'Upload your document',
+    //                 style: Theme.of(context)
+    //                     .textTheme
+    //                     .bodyText2!
+    //                     .copyWith(fontSize: 18),
+    //               ),
+    //             ),
+    //           ),
+    //           Container(
+    //             padding: EdgeInsets.only(
+    //               left: SizeVariables.getWidth(context) * 0.1,
+    //               top: SizeVariables.getHeight(context) * 0.06,
+    //               // bottom: SizeVariables.getHeight(context) * 0.1,
+    //             ),
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 Container(
+    //                   child: Column(
+    //                     children: [
+    //                       Container(
+    //                         child: Row(
+    //                           children: [
+    //                             InkWell(
+    //                               onTap: () async {
+    //                                 if (type == "travel") {
+    //                                   var imagePath = await EdgeDetection
+    //                                       .detectEdge
+    //                                       .then((value) {
+    //                                     print(value.toString());
+    //                                     if (value == null) {
+    //                                       _errorVal(context);
+    //                                     } else {
+    //                                       _imageCaptured(context);
+    //                                     }
+    //                                     return value;
+    //                                   });
+
+    //                                   setState(() {
+    //                                     tfile = XFile(
+    //                                         File(imagePath.toString()).path);
+    //                                   });
+    //                                 } else if (type == "food") {
+    //                                   var imagePath = await EdgeDetection
+    //                                       .detectEdge
+    //                                       .then((value) {
+    //                                     print(value.toString());
+    //                                     if (value == null) {
+    //                                       _errorVal(context);
+    //                                     } else {
+    //                                       _imageCaptured(context);
+    //                                     }
+    //                                     return value;
+    //                                   });
+    //                                   setState(() {
+    //                                     ffile = XFile(
+    //                                         File(imagePath.toString()).path);
+    //                                   });
+    //                                 } else if (type == "incidental") {
+    //                                   var imagePath = await EdgeDetection
+    //                                       .detectEdge
+    //                                       .then((value) {
+    //                                     print(value.toString());
+    //                                     if (value == null) {
+    //                                       _errorVal(context);
+    //                                     } else {
+    //                                       _imageCaptured(context);
+    //                                     }
+    //                                     return value;
+    //                                   });
+
+    //                                   setState(() {
+    //                                     ifile = XFile(
+    //                                         File(imagePath.toString()).path);
+    //                                   });
+    //                                 }
+    //                               },
+    //                               child: Icon(
+    //                                 Icons.camera_alt,
+    //                                 color: Colors.white,
+    //                                 size: 30,
+    //                               ),
+    //                             ),
+    //                             SizedBox(
+    //                               width: SizeVariables.getWidth(context) * 0.01,
+    //                             ),
+    //                             InkWell(
+    //                               onTap: () async {
+    //                                 // tfile = (await FilePicker.platform
+    //                                 //     .pickFiles()) as i.XFile?;
+    //                               },
+    //                               child: Icon(
+    //                                 Icons.file_copy_outlined,
+    //                                 color: Colors.white,
+    //                                 size: 30,
+    //                               ),
+    //                             ),
+    //                           ],
+    //                         ),
+    //                       ),
+    //                       Container(
+    //                         child: FittedBox(
+    //                           fit: BoxFit.contain,
+    //                           child: Text(
+    //                             'Invoice',
+    //                             style: Theme.of(context)
+    //                                 .textTheme
+    //                                 .bodyText1!
+    //                                 .copyWith(
+    //                                     color: const Color.fromARGB(
+    //                                         255, 230, 217, 217)),
+    //                           ),
+    //                         ),
+    //                       ),
+    //                     ],
+    //                   ),
+    //                 ),
+    //               ],
+    //             ),
+    //           )
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
+  }
+
+  void _finalSum(String type, String paytype, String individual_claimamt) {
+    if (type == "travel") {
+      if (tclaim_amount.text == "") {
+        _final_amount = 0.0 +
+            // double.parse(aclaim_amount.text == "" ? "0" : aclaim_amount.text) +
+            double.parse(fclaim_amount.text == "" ? "0" : fclaim_amount.text) +
+            // double.parse(lclaim_amount.text == "" ? "0" : lclaim_amount.text) +
+            double.parse(iclaim_amount.text == "" ? "0" : iclaim_amount.text);
+      } else {
+        _final_amount = double.parse(tclaim_amount.text) +
+            // double.parse(aclaim_amount.text == "" ? "0" : aclaim_amount.text) +
+            double.parse(fclaim_amount.text == "" ? "0" : fclaim_amount.text) +
+            // double.parse(lclaim_amount.text == "" ? "0" : lclaim_amount.text) +
+            double.parse(iclaim_amount.text == "" ? "0" : iclaim_amount.text);
+      }
+    } else if (type == "food") {
+      if (fclaim_amount.text == "") {
+        _final_amount = 0.0 +
+            double.parse(tclaim_amount.text == "" ? "0" : tclaim_amount.text) +
+            // double.parse(aclaim_amount.text == "" ? "0" : aclaim_amount.text) +
+            // double.parse(lclaim_amount.text == "" ? "0" : lclaim_amount.text) +
+            double.parse(iclaim_amount.text == "" ? "0" : iclaim_amount.text);
+      } else {
+        _final_amount = double.parse(fclaim_amount.text) +
+            double.parse(tclaim_amount.text == "" ? "0" : tclaim_amount.text) +
+            // double.parse(aclaim_amount.text == "" ? "0" : aclaim_amount.text) +
+            // double.parse(lclaim_amount.text == "" ? "0" : lclaim_amount.text) +
+            double.parse(iclaim_amount.text == "" ? "0" : iclaim_amount.text);
+      }
+    } else if (type == "incidental") {
+      if (iclaim_amount.text == "") {
+        _final_amount = 0.0 +
+            double.parse(tclaim_amount.text == "" ? "0" : tclaim_amount.text) +
+            // double.parse(aclaim_amount.text == "" ? "0" : aclaim_amount.text) +
+            // double.parse(lclaim_amount.text == "" ? "0" : lclaim_amount.text) +
+            double.parse(fclaim_amount.text == "" ? "0" : fclaim_amount.text);
+      } else {
+        _final_amount = double.parse(iclaim_amount.text) +
+            double.parse(tclaim_amount.text == "" ? "0" : tclaim_amount.text) +
+            // double.parse(aclaim_amount.text == "" ? "0" : aclaim_amount.text) +
+            // double.parse(lclaim_amount.text == "" ? "0" : lclaim_amount.text) +
+            double.parse(fclaim_amount.text == "" ? "0" : fclaim_amount.text);
+      }
+    }
+  }
+
+  Future<Null> displayPrediction(
+      String place_id, TextEditingController field) async {
+    if (place_id != null) {
+      GoogleMapsPlaces googleplace = GoogleMapsPlaces(
+        apiKey: kGoogleApiKey,
+        apiHeaders: await GoogleApiHeaders().getHeaders(),
+      );
+      PlacesDetailsResponse detail =
+          await googleplace.getDetailsByPlaceId(place_id);
+
+      field.text = detail.result.formattedAddress.toString();
+    }
+  }
+
+  _submitpopup(String type, BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Color.fromARGB(255, 103, 103, 101),
+        title: Container(
+          child: Column(
+            children: [
+              Container(
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: Text(
+                    'Are You Sure You Want To Submit This Claim?',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: SizeVariables.getHeight(context) * 0.03,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          Container(
+            decoration: BoxDecoration(
+              // color: Color.fromARGB(168, 94, 92, 92),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(255, 74, 74, 70),
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Color.fromARGB(168, 94, 92, 92),
+              ),
+              //     disabledColor: Colors.red,
+              // disabledTextColor: Colors.black,
+              // padding: const EdgeInsets.all(8),
+              // textColor: Color(0xffF59F23),
+              // color: Color.fromARGB(168, 81, 80, 80),
+              onPressed: () => Provider.of<ClaimzFormIndividualViewModel>(
+                      context,
+                      listen: false)
+                  .conveyanceFinalSubmit(context, widget.data['doc_no']),
+              child: Text('Ok ',
+                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                        color: Color(0xffF59F23),
+                      )),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              // color: Color.fromARGB(168, 94, 92, 92),
+              shape: BoxShape.rectangle,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(255, 74, 74, 70),
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Color.fromARGB(168, 94, 92, 92),
+              ),
+              //     disabledColor: Colors.red,
+              // disabledTextColor: Colors.black,
+              // padding: const EdgeInsets.all(8),
+              // textColor: Color(0xffF59F23),
+              // color: Color.fromARGB(168, 81, 80, 80),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('No',
+                  style: Theme.of(context).textTheme.bodyText2?.copyWith(
+                        color: Color(0xffF59F23),
+                      )),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void resetAnimation() {
+    animation = Matrix4Tween(begin: controller.value, end: Matrix4.identity())
+        .animate(CurvedAnimation(
+            parent: animationController, curve: Curves.bounceIn));
+
+    animationController.forward(from: 0);
+  }
+
+  void showOverlay(BuildContext context) {
+    final overlay = Overlay.of(context)!;
+    overlay.insert(entry!);
+  }
+
+  _popupApprove(String type, BuildContext context) {
+    TextEditingController remarks = new TextEditingController();
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.black,
+        title: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Give Remarks",
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(color: Colors.grey),
+              ),
+              TextFormField(
+                controller: _remarks,
+                cursorColor: Colors.white,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Enter Remarks",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  // prefixIcon: Icon(
+                  //   Icons.info,
+                  //   color: Colors.white,
+                  // ),
+                ),
+                style: Theme.of(context).textTheme.bodyText1,
+                validator: (val) => val!.isEmpty ? 'Enter Remarks' : null,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(168, 94, 92, 92),
+                      ),
+                      onPressed: () {
+                        if (_remarks.text == '') {
+                          Flushbar(
+                            message: 'Please Enter Remarks',
+                            icon: Icon(
+                              Icons.info_outline,
+                              size: 28.0,
+                              color: Colors.blue,
+                            ),
+                            duration: Duration(seconds: 3),
+                            leftBarIndicatorColor: Colors.blue,
+                          )..show(context);
+                        } else {
+                          Map<String, dynamic> data = {
+                            "doc_no": widget.data["doc_no"],
+                            "status": 1,
+                            "remarks": _remarks.text,
+                          };
+                          Provider.of<ClaimzFormIndividualViewModel>(context,
+                                  listen: false)
+                              .conveyanceAction(
+                                  data, widget.refreshData, context);
+                        }
+                      },
+                      child: Text('Approve',
+                          style:
+                              Theme.of(context).textTheme.bodyText2?.copyWith(
+                                    color: Color(0xffF59F23),
+                                  )),
+                    ),
+                  ),
+                  Container(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(168, 94, 92, 92),
+                      ),
+                      //     disabledColor: Colors.red,
+                      // disabledTextColor: Colors.black,
+                      // padding: const EdgeInsets.all(12),
+                      // textColor: Color(0xffF59F23),
+                      // : Color.fromARGB(168, 81, 80, 80),
+                      onPressed: () {
+                        if (_remarks.text == '') {
+                          Flushbar(
+                            message: 'Please Enter Remarks',
+                            icon: Icon(
+                              Icons.info_outline,
+                              size: 28.0,
+                              color: Colors.blue,
+                            ),
+                            duration: Duration(seconds: 3),
+                            leftBarIndicatorColor: Colors.blue,
+                          )..show(context);
+                        } else {
+                          Map<String, dynamic> data = {
+                            "doc_no": widget.data["doc_no"],
+                            "status": 999999,
+                            "remarks": _remarks.text,
+                          };
+                          Provider.of<ClaimzFormIndividualViewModel>(context,
+                                  listen: false)
+                              .conveyanceAction(
+                                  data, widget.refreshData, context);
+                        }
+                      },
+                      child: Text('Reject',
+                          style:
+                              Theme.of(context).textTheme.bodyText2?.copyWith(
+                                    color: Color(0xffF59F23),
+                                  )),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void checkInput(String content) {
+    print('INPUTTTTTTT: $content');
+  }
+}
+
+double checkGST(double basic, double gst, BuildContext context) {
+  print('GST AMOUNT: $gst');
+
+  double gst_amt_t = basic * 0.28;
+
+  print('GST AMOUNT LIMIT: $gst_amt_t');
+
+  return gst_amt_t;
+
+  // if(gst >= 1.0 && gst <= gst_amt_t) {
+
+  // }
+
+  // if (gst >= 0.0 && gst <= gst_amt_t) {
+  //   print("GST ACCEPTABLE");
+  //   return true;
+  // } else {
+  //   print("GST EXCEEDED BY: " + (gst - gst_amt_t).toString());
+  //   Flushbar(
+  //     leftBarIndicatorColor: Colors.red,
+  //     icon: Icon(Icons.warning, color: Colors.white),
+  //     message: 'GST EXCEEDED BY: " + ${(gst - gst_amt_t).toString()}',
+  //     duration: const Duration(seconds: 10),
+  //   ).show(context);
+  //   return false;
+  // }
+}

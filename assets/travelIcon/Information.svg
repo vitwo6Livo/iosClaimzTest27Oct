@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg2"
+   xml:space="preserve"
+   width="2000"
+   height="2000"
+   viewBox="0 0 2000 2000"
+   sodipodi:docname="Information.ai"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs6"><clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath16"><path
+         d="M 0,1500 H 1500 V 0 H 0 Z"
+         id="path14" /></clipPath></defs><sodipodi:namedview
+     id="namedview4"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0" /><g
+     id="g8"
+     inkscape:groupmode="layer"
+     inkscape:label="Information"
+     transform="matrix(1.3333333,0,0,-1.3333333,0,2000)"><g
+       id="g10"><g
+         id="g12"
+         clip-path="url(#clipPath16)"><g
+           id="g18"
+           transform="translate(1331.333,83.7773)"><path
+             d="m 0,0 h -1162.667 c -47.864,0 -86.666,38.803 -86.666,86.667 v 1162.667 c 0,47.864 38.802,86.666 86.666,86.666 L 0,1336 c 47.865,0 86.667,-38.802 86.667,-86.666 V 86.667 C 86.667,38.803 47.865,0 0,0 Z"
+             style="fill:none;stroke:#f4a128;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path20" /></g><g
+           id="g22"
+           transform="translate(853.7373,1192.5928)"><path
+             d="m 0,0 c 1.543,-46.311 -32.418,-83.359 -86.447,-83.359 -47.854,0 -81.815,37.048 -81.815,83.359 0,47.854 35.505,84.903 84.903,84.903 C -32.418,84.903 0,47.854 0,0"
+             style="fill:#f4a128;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path24" /></g><g
+           id="g26"
+           transform="translate(702.4561,371.3486)"><path
+             d="m 0,0 v 611.302 c 75.024,0 135.844,-60.819 135.844,-135.844 V -135.844 C 60.819,-135.844 0,-75.024 0,0"
+             style="fill:#f4a128;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path28" /></g></g></g></g></svg>
