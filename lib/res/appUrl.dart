@@ -1,6 +1,6 @@
 class AppUrl {
-  static var baseUrl = 'https://console.claimz.in/api'; //LIVE LINK
-  // static var baseUrl = 'http://consoledev.claimz.in/api'; //TEST LINK
+  // static var baseUrl = 'https://console.claimz.in/api'; //LIVE LINK
+  static var baseUrl = 'http://consoledev.claimz.in/api'; //TEST LINK
 
   static var iosDashboard = '$baseUrl/api/ios-dashboard';
   static var iosBirthday = '$baseUrl/api/ios-birthday';
@@ -137,10 +137,11 @@ class AppUrl {
   static var editReason = '$baseUrl/api/edit-pending-leave';
 
   /////////////////////////////// Sales Oder ///////////////////
-  // static var salesBaseUrl = 'http://devalpha.vitwo.ai/api/v2/salesperson';  //Test Link
-
   static var salesBaseUrl =
-      'https://one.vitwo.ai/api/v2/salesperson'; //Live Link
+      'http://devalpha.vitwo.ai/api/v2/salesperson'; //Test Link
+
+  // static var salesBaseUrl =
+  //     'https://one.vitwo.ai/api/v2/salesperson'; //Live Link
 
   static var customerSales = '$salesBaseUrl/customers_fetch.php';
   static var fetchGoodItems = '$salesBaseUrl/item_goods_fetch.php';

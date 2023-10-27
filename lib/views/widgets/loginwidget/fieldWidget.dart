@@ -269,11 +269,11 @@ class _FieldwidgetState extends State<Fieldwidget> {
                             // 'fcm_code': fcm,
                             // 'device_id': 'RP1A.200720.012'
                             // 'device_id': 'a738f0f522f72cba',
-                            // 'device_id': 'd548149ffc125ebe' //My Device ID
+                            'device_id': 'd548149ffc125ebe' //My Device ID
                             // 'device_id':
                             //     'd8b64dad7d49653b' //Salim Sir's Device ID
                             // 'device_id': 'f944fc8f9ecc19ab' //Neeraj Sir's ID
-                            'device_id': _identifier
+                            // 'device_id': _identifier
                           };
 
                           if (kDebugMode) {

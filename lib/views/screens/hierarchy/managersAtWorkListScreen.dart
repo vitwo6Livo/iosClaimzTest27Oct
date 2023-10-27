@@ -62,6 +62,16 @@ class _ManagerAtWorkListScreenState extends State<ManagerAtWorkListScreen> {
     final providerTwo = Provider.of<ReportingTreeViewModel>(context).all;
     // final provider = Provider.of<ReportingTreeViewModel>(context).tree;
 
+    print('Latitudeeeeeee: ${providerTwo[0]['lat']}   RuntimeType: ${providerTwo[0]['lat'].runtimeType}');
+
+    print('Longitude: ${providerTwo[0]['lng']}   RuntimeType: ${providerTwo[0]['lng'].runtimeType}');
+
+
+    // print(object);
+
+    // double.parse(providerTwo[index]['lat']),
+    //                     double.parse(providerTwo[index]['lng'])
+
     print('ALL EMPLOYEES: $providerTwo');
 
     // TODO: implement build
@@ -1118,8 +1128,8 @@ class _ManagerAtWorkListScreenState extends State<ManagerAtWorkListScreen> {
                   children: [
                     TileLayer(
                         urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.claimz.claimz'),
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png', 
+                        userAgentPackageName: 'com.claimz.claimzpublic'),
                     MarkerLayer(
                       markers: [
                         Marker(

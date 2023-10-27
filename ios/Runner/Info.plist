@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>dev.flutter.background.refresh</string>
-	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -38,9 +34,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This application needs access to your camera for taking pictures of invoices and for setting the profile picture.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app doesn&apos;t need users to keep their location access always turned on. Rather, it requires access to location as required for registering a user&apos;s attendance for the day while it is in use</string>
+	<string>This app doesn't need users to keep their location access always turned on. Rather, it requires access to location as required for registering a user's attendance for the day while it is in use</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app doesn&apos;t need users to keep their location access always turned on</string>
+	<string>This app doesn't need users to keep their location access always turned on</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This application requires access to location as required for registering your attendance for the day</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -52,7 +48,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
-		<string>remote-notification</string>
+		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -67,5 +63,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<!-- Background Processing -->
+  <!-- <key>UIBackgroundModes</key>
+  <array>
+	  <string>processing</string>
+  </array> -->
+  
+  <!-- Task Schedulling -->
+  <key>BGTaskSchedulerPermittedIdentifiers</key>
+  <array>
+     <string>task-identifier</string>
+  </array>
+  
+  <!-- Background Fetching -->
+  <!-- <key>UIBackgroundModes</key>
+  <array>
+	  <string>fetch</string>
+  </array> -->
 </dict>
 </plist>

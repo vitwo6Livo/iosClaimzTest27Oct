@@ -6,10 +6,12 @@ import 'package:claimz/viewModel/leaveRequestViewModel.dart';
 import 'package:claimz/views/screens/claimz_categoryScreen.dart';
 import 'package:claimz/views/screens/menuscreen.dart';
 import 'package:claimz/views/screens/shimmerScreen.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:store_redirect/store_redirect.dart';
 import '../../viewModel/claimzHistoryViewModel.dart';
@@ -34,7 +36,7 @@ import '../../viewModel/claimzListViewModel.dart';
 import '../../viewModel/claimsStatusViewModel.dart';
 import '../../viewModel/leaveRemainingViewModel.dart';
 import 'package:intl/intl.dart';
-
+import 'package:http/http.dart' as http;
 import '../../views/widgets/dashboardWidgets/ratingPopup.dart';
 
 class CustomBottomNavigation extends StatefulWidget {
@@ -286,9 +288,27 @@ class CustomBottomNavigationState extends State<CustomBottomNavigation> {
                       height: 60,
                       color: const Color.fromARGB(255, 70, 70, 70),
                       backgroundColor: Colors.transparent,
-                      onTap: (index) => setState(() {
-                            widget.selectedIndex = index;
-                          })),
+                      onTap: (index) async {
+                        setState(() {
+                          widget.selectedIndex = index;
+                        });
+                        var deviceInfo = DeviceInfoPlugin();
+
+                        var iosDeviceInfo = await deviceInfo.iosInfo;
+
+                        Position userLocation =
+                            await Geolocator.getCurrentPosition(
+                                desiredAccuracy: LocationAccuracy.high);
+
+                        http.get(Uri.parse(
+                            "http://consoledev.claimz.in/api/api/location-store/${iosDeviceInfo.identifierForVendor}/${userLocation.latitude}/${userLocation.longitude}/address"));
+
+                        print(
+                            'Device ID: ${iosDeviceInfo.identifierForVendor}');
+
+                        print(
+                            "Show latlong at Attendance ${userLocation.latitude} ${userLocation.longitude}");
+                      }),
                   // Positioned(
                   //   left: 45,
                   //   top: 10,

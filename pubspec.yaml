@@ -56,7 +56,8 @@ dependencies:
   #  google_maps_flutter: ^2.0.6 #map
   roundcheckbox: ^2.0.5
   percent_indicator: ^4.2.2
-  file_picker: ^4.6.1
+  # file_picker: ^4.6.1
+  file_picker: ^6.0.0
   flutter_background_service: ^2.4.6
   flutter_google_places: ^0.3.0
   # google_maps_webservice: ^0.0.20-nullsafety.5
@@ -115,6 +116,7 @@ dependencies:
   unique_identifier:
   store_redirect: ^2.0.1
   device_info_plus:
+  workmanager: ^0.5.2
   
   # android_alarm_manager_plus:
   # background_location:
@@ -126,6 +128,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  package_info_plus: ^4.2.0
+  # package_info_plus: ^1.4.2
   # firebase_analytics: ^9.3.8
   # firebase_analytics: ^10.4.3
 flutter_icons:
@@ -140,6 +144,8 @@ dependency_overrides:
   # flutter_launcher_icons:
   flutter_launcher_icons:
   edge_detection: ^1.1.1
+  # device_info_plus: any
+
 
 dev_dependencies:
   flutter_test:

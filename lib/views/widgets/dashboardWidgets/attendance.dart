@@ -7,6 +7,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:claimz/provider/theme_provider.dart';
 import 'package:claimz/res/components/alert_dialog.dart';
 import 'package:claimz/services/backgroundServices.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 // import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -21,6 +22,7 @@ import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
+import 'package:workmanager/workmanager.dart';
 import '../../../main.dart';
 import '../../../res/appUrl.dart';
 import '../../../res/components/containerStyle.dart';
@@ -646,6 +648,21 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ${localStorage.getString('token')},'
           });
+    }).then((value) async {
+      var deviceInfo = DeviceInfoPlugin();
+
+      var iosDeviceInfo = await deviceInfo.iosInfo;
+
+      Position userLocation = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      http.get(Uri.parse(
+          "http://consoledev.claimz.in/api/api/location-store/${iosDeviceInfo.identifierForVendor}/${userLocation.latitude}/${userLocation.longitude}/address"));
+
+      print('Device ID: ${iosDeviceInfo.identifierForVendor}');
+
+      print(
+          "Show latlong at Attendance ${userLocation.latitude} ${userLocation.longitude}");
     });
 
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
@@ -740,6 +757,21 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ${localStorage.getString('token')},'
             });
+      }).then((value) async {
+        var deviceInfo = DeviceInfoPlugin();
+
+        var iosDeviceInfo = await deviceInfo.iosInfo;
+
+        Position userLocation = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+
+        http.get(Uri.parse(
+            "http://consoledev.claimz.in/api/api/location-store/${iosDeviceInfo.identifierForVendor}/${userLocation.latitude}/${userLocation.longitude}/address"));
+
+        print('Device ID: ${iosDeviceInfo.identifierForVendor}');
+
+        print(
+            "Show latlong at Attendance ${userLocation.latitude} ${userLocation.longitude}");
       });
 
       getCheckOutDetails();
@@ -1183,11 +1215,8 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
                                                         .copyWith(
                                                             fontSize: 10,
                                                             color: const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                61,
-                                                                255,
-                                                                190)),
+                                                                .fromARGB(255,
+                                                                61, 255, 190)),
                                                   )
                                                 ],
                                               ),
@@ -1205,11 +1234,8 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
                                                         .copyWith(
                                                             fontSize: 10,
                                                             color: const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                61,
-                                                                255,
-                                                                190)),
+                                                                .fromARGB(255,
+                                                                61, 255, 190)),
                                                   )
                                                 ],
                                               )
@@ -1251,7 +1277,7 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
                                                         .copyWith(
                                                           fontSize: 10,
                                                           color: const Color
-                                                                  .fromARGB(
+                                                              .fromARGB(
                                                               255, 232, 96, 96),
                                                         ),
                                                   )
@@ -1276,11 +1302,8 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
                                                         .copyWith(
                                                             fontSize: 10,
                                                             color: const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                232,
-                                                                96,
-                                                                96)),
+                                                                .fromARGB(255,
+                                                                232, 96, 96)),
                                                   )
                                                 ],
                                               )
@@ -1607,17 +1630,52 @@ class AttendanceWidgetState extends State<AttendanceWidget> {
   }
 }
 
+const fetchBackground = "fetchBackground";
+
+void callbackDispatcher() async {
+  String identifier;
+
+  identifier = (await UniqueIdentifier.serial)!;
+
+  Workmanager().executeTask((task, inputData) async {
+    switch (task) {
+      case fetchBackground:
+        // Code to run in background
+
+        //   print("Backhround Fired From Attendance at ${DateTime.now()}");
+
+        var deviceInfo = DeviceInfoPlugin();
+
+        var iosDeviceInfo = await deviceInfo.iosInfo;
+
+        Position userLocation = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+
+        http.get(Uri.parse(
+            "http://consoledev.claimz.in/api/api/location-store/${iosDeviceInfo.identifierForVendor}/${userLocation.latitude}/${userLocation.longitude}/address"));
+
+        print('Device ID: ${iosDeviceInfo.identifierForVendor}');
+
+        print(
+            "Show latlong at Attendance ${userLocation.latitude} ${userLocation.longitude}");
+
+        break;
+    }
+    return Future.value(true);
+  });
+}
+
 // @pragma('vm:entry-point')
 // Future<void> fireLocation() async {
-//   print("Backhround Fired From Attendance at ${DateTime.now()}");
+  // print("Backhround Fired From Attendance at ${DateTime.now()}");
 
-//   var deviceInfo = DeviceInfoPlugin();
+  // var deviceInfo = DeviceInfoPlugin();
 
-//   var androidDeviceInfo = await deviceInfo.androidInfo;
+  // var androidDeviceInfo = await deviceInfo.androidInfo;
 
-//   Position userLocation = await Geolocator.getCurrentPosition(
-//       desiredAccuracy: LocationAccuracy.high);
-//   // print("Show latlong ${userLocation.longitude}");
+  // Position userLocation = await Geolocator.getCurrentPosition(
+  //     desiredAccuracy: LocationAccuracy.high);
+  // // print("Show latlong ${userLocation.longitude}");
 
 //   // await http.get(
 //   //   Uri.parse(

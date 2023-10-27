@@ -40,6 +40,8 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_10y.dart';
+import 'package:unique_identifier/unique_identifier.dart';
+import 'package:workmanager/workmanager.dart';
 import './services/locationPermissions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -101,137 +103,25 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 FlutterLocalNotificationsPlugin notificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
-// to ensure this is executed
-// run app from xcode, then from xcode menu, select Simulate Background Fetch
-// bool onIosBackground(ServiceInstance service) {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   print('FLUTTER BACKGROUND FETCH');
-
-//   return true;
-// }
-
-// void onStart(ServiceInstance service) async {
-//   // Only available for flutter 3.0.0 and later
-//   DartPluginRegistrant.ensureInitialized();
-
-//   // For flutter prior to version 3.0.0
-//   // We have to register the plugin manually
-//   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-//       FlutterLocalNotificationsPlugin();
-
-//   service.on('stop').listen((event) {
-//     service.stopSelf();
-//   });
-
-//   // bring to foreground
-
-//   Future<Position> _getGeoLocationPosition() async {
-//     bool serviceEnabled;
-//     LocationPermission permission;
-//     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//     if (!serviceEnabled) {
-//       await Geolocator.openLocationSettings();
-//       return Future.error('Location services are disabled.');
-//     }
-//     permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.denied) {
-//         return Future.error('Location permissions are denied');
-//       }
-//     }
-//     if (permission == LocationPermission.deniedForever) {
-//       return Future.error(
-//           'Location permissions are permanently denied, we cannot request permissions.');
-//     }
-
-//     return await Geolocator.getCurrentPosition(
-//         desiredAccuracy: geol.LocationAccuracy.bestForNavigation);
-//   }
-
-//   Timer.periodic(const Duration(minutes: 1), (timer) async {
-//     SharedPreferences localStorage = await SharedPreferences.getInstance();
-
-//     Position positioned = await _getGeoLocationPosition().then((value) {
-//       print(value.toString());
-//       return value;
-//     });
-
-//     //post data
-//     geol.Position? position = await geol.Geolocator.getLastKnownPosition();
-
-//     await placemarkFromCoordinates(position!.latitude, position.longitude)
-//         .then((value) async {
-//       var first = value.first;
-//       var address =
-//           '${first.name}, ${first.locality}, ${first.administrativeArea},${first.subLocality}, ${first.postalCode}';
-//       print(address);
-
-//       Map<String, String> body = {
-//         "lat": position.latitude.toString(),
-//         "lng": position.longitude.toString(),
-//         "address": address,
-//       };
-
-//       print("BACKGROUND SCAN: $body");
-
-//       String authToken = localStorage.getString('token').toString();
-
-//       var response = await http.post(Uri.parse(AppUrl.claimz_post_location),
-//           body: json.encode(body),
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Bearer $authToken,'
-//           });
-
-//       print('STATUS CODE: ${response.statusCode}');
-
-//       print('RESPONSE: ${json.decode(response.body)}');
-//     });
-
-//     /// you can see this log in logcat
-//     print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
-
-//     // test using external plugin
-//     final deviceInfo = DeviceInfoPlugin();
-//     String? device;
-//     if (Platform.isAndroid) {
-//       final androidInfo = await deviceInfo.androidInfo;
-//       device = androidInfo.model;
-//     }
-
-//     if (Platform.isIOS) {
-//       final iosInfo = await deviceInfo.iosInfo;
-//       device = iosInfo.model;
-//     }
-
-//     service.invoke(
-//       'update',
-//       {
-//         "current_date": DateTime.now().toIso8601String(),
-//         "device": device,
-//       },
-//     );
-//   });
-// }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // if (Platform.isAndroid) {
+  //   // await AndroidAlarmManager.initialize();
+  // } else if (Platform.isIOS) {
+  //   await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  //   await Workmanager().registerPeriodicTask(
+  //     "1",
+  //     fetchBackground,
+  //     initialDelay: const Duration(minutes: 10),
+  //     frequency: const Duration(minutes: 15),
+  //     constraints: Constraints(
+  //       networkType: NetworkType.connected,
+  //     ),
+  //   );
+  // }
+
   await FaceCamera.initialize();
-
-  // await initializeService();
-
-  // await AndroidAlarmManager.initialize();
-  // initializeService();
-  // Future.delayed(
-  //     Duration(seconds: 2), () => FlutterBackgroundService().invoke("stop"));
-
-  // Timer.periodic(
-  //     Duration(seconds: 5),
-  //     (timer) => Provider.of<AnnouncementViewModel>(contextt!, listen: false)
-  //         .getAllAnouncements(
-  //             DateFormat('MMMM').format(DateTime.now()).toString(),
-  //             DateFormat('yyyy').format(DateTime.now()).toString()));
 
   AndroidInitializationSettings androidSettings =
       const AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -254,58 +144,6 @@ void main() async {
       ignoreSsl:
           true // option: set to false to disable working with http links (default: false)
       );
-  // FlutterDownloader.registerCallback(TestClass.callback);
-
-//   const notificationChannelId = 'my_foreground';
-
-// // this will be used for notification id, So you can update your custom notification with this id.
-// const notificationId = 888;
-
-  // Future<void> initializeService() async {
-  //   final service = FlutterBackgroundService();
-
-  //   // const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  //   //   notificationChannelId, // id
-  //   //   'MY FOREGROUND SERVICE', // title
-  //   //   description:
-  //   //       'This channel is used for important notifications.', // description
-  //   //   importance: Importance.low, // importance must be at low or higher level
-  //   // );
-
-  //   // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  //   //     FlutterLocalNotificationsPlugin();
-
-  //   // await flutterLocalNotificationsPlugin
-  //   //     .resolvePlatformSpecificImplementation<
-  //   //         AndroidFlutterLocalNotificationsPlugin>()
-  //   //     ?.createNotificationChannel(channel);
-
-  //   await service.configure(
-  //     androidConfiguration: AndroidConfiguration(
-  //       // this will be executed when app is in foreground or background in separated isolate
-  //       onStart: onStart,
-  //       // auto start service
-  //       autoStart: true,
-  //       isForegroundMode: true,
-
-  //       // notificationChannelId: notificationChannelId, // this must match with notification channel you created above.
-  //       // initialNotificationTitle: 'AWESOME SERVICE',
-  //       // initialNotificationContent: 'Initializing',
-  //       // foregroundServiceNotificationId: notificationId,
-  //     ),
-  //     iosConfiguration: IosConfiguration(
-  //       // auto start service
-  //       autoStart: true,
-
-  //       // this will be executed when app is in foreground in separated isolate
-  //       onForeground: onStart,
-
-  //       // you have to enable background fetch capability on xcode project
-  //       onBackground: onIosBackground,
-  //     ),
-  //   );
-  //   service.startService();
-  // }
 
   runApp(ClaimzApp());
   configLoading();
@@ -314,15 +152,6 @@ void main() async {
 class TestClass {
   static void callback(String id, DownloadTaskStatus status, int progress) {}
 }
-// void main() async{
-//   // initserviceCall();
-//   await FlutterDownloader.initialize(
-//       debug: true, // optional: set to false to disable printing logs to console (default: true)
-//       ignoreSsl: true // option: set to false to disable working with http links (default: false)
-//   );
-//   FlutterDownloader.registerCallback(TestClass.callback);
-
-//   runApp(ClaimzApp());}
 
 class ClaimzApp extends StatefulWidget {
   ClaimzAppState createState() => ClaimzAppState();
@@ -332,263 +161,6 @@ const notificationChannelId = 'my_foreground';
 
 // this will be used for notification id, So you can update your custom notification with this id.
 const notificationId = 888;
-
-// Future<void> startTracking(bool action) async {
-//   Future<Position> _getGeoLocationPosition() async {
-//     bool serviceEnabled;
-//     LocationPermission permission;
-//     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//     if (!serviceEnabled) {
-//       await Geolocator.openLocationSettings();
-//       return Future.error('Location services are disabled.');
-//     }
-//     permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.denied) {
-//         return Future.error('Location permissions are denied');
-//       }
-//     }
-//     if (permission == LocationPermission.deniedForever) {
-//       return Future.error(
-//           'Location permissions are permanently denied, we cannot request permissions.');
-//     }
-
-//     return await Geolocator.getCurrentPosition(
-//         desiredAccuracy: geol.LocationAccuracy.bestForNavigation);
-//   }
-
-//   Timer.periodic(const Duration(minutes: 1), (Timer t) async {
-//     if (action == true) {
-//       SharedPreferences localStorage = await SharedPreferences.getInstance();
-
-//       Position positioned = await _getGeoLocationPosition().then((value) {
-//         print(value.toString());
-//         return value;
-//       });
-
-//       //post data
-//       geol.Position? position = await geol.Geolocator.getLastKnownPosition();
-
-//       await placemarkFromCoordinates(position!.latitude, position!.longitude)
-//           .then((value) async {
-//         var first = value.first;
-//         var address =
-//             '${first.name}, ${first.locality}, ${first.administrativeArea},${first.subLocality}, ${first.postalCode}';
-//         print(address);
-
-//         Map<String, String> body = {
-//           "lat": position.latitude.toString(),
-//           "lng": position.longitude.toString(),
-//           "address": address,
-//           'time': DateTime.now().toString()
-//         };
-//         print("BACKGROUND SCAN " + body.toString());
-//         String authToken = localStorage.getString('token').toString();
-//         var response = await http.post(Uri.parse(AppUrl.claimz_post_location),
-//             body: json.encode({
-//               "lat": position.latitude.toString(),
-//               "lng": position.longitude.toString(),
-//               "address": address
-//             }),
-//             headers: {
-//               'Content-Type': 'application/json',
-//               'Authorization': 'Bearer $authToken'
-//             });
-
-//         print('STATUS CODE: ${response.statusCode}');
-
-//         print('RESPONSE: ${json.decode(response.body)}');
-//       });
-//     } else {
-//       t.cancel();
-//     }
-//   });
-// }
-
-// Future<void> initializeService() async {
-//   final service = FlutterBackgroundService();
-
-//   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-//     notificationChannelId, // id
-//     'MY FOREGROUND SERVICE', // title
-//     description:
-//         'This channel is used for important notifications.', // description
-//     importance: Importance.low, // importance must be at low or higher level
-//   );
-
-//   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-//       FlutterLocalNotificationsPlugin();
-
-//   await flutterLocalNotificationsPlugin
-//       .resolvePlatformSpecificImplementation<
-//           AndroidFlutterLocalNotificationsPlugin>()
-//       ?.createNotificationChannel(channel);
-
-//   await service.configure(
-//     androidConfiguration: AndroidConfiguration(
-//         // this will be executed when app is in foreground or background in separated isolate
-//         onStart: onStart,
-//         // auto start service
-//         autoStart: true,
-//         isForegroundMode: true,
-//         notificationChannelId:
-//             notificationChannelId, // this must match with notification channel you created above.
-//         initialNotificationTitle: 'AWESOME SERVICE',
-//         initialNotificationContent: 'Initializing',
-//         foregroundServiceNotificationId: notificationId),
-//     iosConfiguration: IosConfiguration(
-//       // auto start service
-//       autoStart: true,
-
-//       // this will be executed when app is in foreground in separated isolate
-//       onForeground: onStart,
-
-//       // you have to enable background fetch capability on xcode project
-//       onBackground: onIosBackground,
-//     ),
-//   );
-//   service.startService();
-// }
-
-// to ensure this is executed
-// run app from xcode, then from xcode menu, select Simulate Background Fetch
-// bool onIosBackground(ServiceInstance service) {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   print('FLUTTER BACKGROUND FETCH');
-
-//   return true;
-// }
-
-// void onStart(ServiceInstance service) async {
-//   // Only available for flutter 3.0.0 and later
-//   DartPluginRegistrant.ensureInitialized();
-
-//   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-//       FlutterLocalNotificationsPlugin();
-
-//   // For flutter prior to version 3.0.0
-//   // We have to register the plugin manually
-
-//   service.on('stop').listen((event) {
-//     service.stopSelf();
-//   });
-
-//   // bring to foreground
-
-//   Future<Position> _getGeoLocationPosition() async {
-//     bool serviceEnabled;
-//     LocationPermission permission;
-//     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//     if (!serviceEnabled) {
-//       await Geolocator.openLocationSettings();
-//       return Future.error('Location services are disabled.');
-//     }
-//     permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.denied) {
-//         return Future.error('Location permissions are denied');
-//       }
-//     }
-//     if (permission == LocationPermission.deniedForever) {
-//       return Future.error(
-//           'Location permissions are permanently denied, we cannot request permissions.');
-//     }
-
-//     return await Geolocator.getCurrentPosition(
-//         desiredAccuracy: geol.LocationAccuracy.bestForNavigation);
-//   }
-
-//   Timer.periodic(const Duration(minutes: 5), (timer) async {
-//     SharedPreferences localStorage = await SharedPreferences.getInstance();
-
-//     Position positioned = await _getGeoLocationPosition().then((value) {
-//       print(value.toString());
-//       return value;
-//     });
-
-//     // if (service is AndroidServiceInstance) {
-//     //   if (await service.isForegroundService()) {
-
-//     flutterLocalNotificationsPlugin.show(
-//       notificationId,
-//       'COOL SERVICE',
-//       'Awesome ${DateTime.now()}',
-//       const NotificationDetails(
-//         android: AndroidNotificationDetails(
-//           notificationChannelId,
-//           'MY FOREGROUND SERVICE',
-//           icon: 'ic_bg_service_small',
-//           ongoing: true,
-//         ),
-//       ),
-//     );
-//     //   }
-//     // }
-
-//     //post data
-//     geol.Position? position = await geol.Geolocator.getLastKnownPosition();
-
-//     await placemarkFromCoordinates(position!.latitude, position!.longitude)
-//         .then((value) async {
-//       var first = value.first;
-//       var address =
-//           '${first.name}, ${first.locality}, ${first.administrativeArea},${first.subLocality}, ${first.postalCode}';
-//       print(address);
-
-//       Map<String, String> body = {
-//         "lat": position.latitude.toString(),
-//         "lng": position.longitude.toString(),
-//         "address": address,
-//         'time': DateTime.now().toString()
-//       };
-
-//       print("BACKGROUND SCAN " + body.toString());
-
-//       String authToken = localStorage.getString('token').toString();
-
-//       var response = await http.post(Uri.parse(AppUrl.claimz_post_location),
-//           body: json.encode({
-//             "lat": position.latitude.toString(),
-//             "lng": position.longitude.toString(),
-//             "address": address,
-//           }),
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Bearer $authToken,'
-//           });
-
-//       print('STATUS CODE: ${response.statusCode}');
-
-//       print('RESPONSE: ${json.decode(response.body)}');
-//     });
-
-//     /// you can see this log in logcat
-//     print('FLUTTER BACKGROUND SERVICE: ${DateTime.now()}');
-
-//     // test using external plugin
-//     final deviceInfo = DeviceInfoPlugin();
-//     String? device;
-//     if (Platform.isAndroid) {
-//       final androidInfo = await deviceInfo.androidInfo;
-//       device = androidInfo.model;
-//     }
-
-//     if (Platform.isIOS) {
-//       final iosInfo = await deviceInfo.iosInfo;
-//       device = iosInfo.model;
-//     }
-
-//     service.invoke(
-//       'update',
-//       {
-//         "current_date": DateTime.now().toIso8601String(),
-//         "device": device,
-//       },
-//     );
-//   });
-// }
 
 class ClaimzAppState extends State<ClaimzApp> {
   ThemeProvider themeProvider = ThemeProvider();

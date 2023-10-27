@@ -39,6 +39,8 @@ class MapScreenState extends State<MapScreen> {
 
   @override
   void initState() {
+    print('Device IDDDDDD: ${widget.data}');
+
     // TODO: implement initState
     Provider.of<MapMarkers>(context, listen: false)
         .mapMarkers(widget.data)
